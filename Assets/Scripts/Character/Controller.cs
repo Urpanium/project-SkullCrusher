@@ -38,6 +38,9 @@ namespace Character
         [Header("Crouch")] public float crouchColliderHeight = 0.5f;
         public float crouchSpeedMultiplier = 1.0f;
         public Vector3 crouchCameraCenter = new Vector3(0.0f, 0.25f, 0.0f);
+        public Vector3 ceilingSphereCenter;
+        public float ceilingSphereRadius = 0.5f;
+        public float ceilingSphereCastDistance = 0.1f;
         [Header("Look")] public float sensitivity = 10.0f;
         public bool invertX;
         public bool invertY;
@@ -64,8 +67,6 @@ namespace Character
         private InputManagerOld inputManager;
 
         //private bool isGrounded;
-        private Vector3 groundNormal;
-        private Vector3 groundPosition;
         private bool isGroundedInPreviousFrame;
 
         private float initialColliderHeight;
@@ -109,6 +110,8 @@ namespace Character
         {
             Vector3 accelerateDirection = GetMovementDirection(input);
 
+            Vector3 groundNormal;
+            Vector3 groundPosition;
             bool isGrounded = IsGrounded(out groundNormal, out groundPosition);
 
             if (isGrounded) //ground movements
@@ -126,7 +129,7 @@ namespace Character
 
                     if (inputManager.isJumpPressed)
                     {
-                        velocity += Gravity.up * jumpForce;
+                        velocity += Gravity.up * (isCrouchPressed ? jumpForce * 0.5f : jumpForce);
                     }
                 }
                 else
@@ -242,20 +245,21 @@ namespace Character
 
         private void CrouchControl(bool input)
         {
-            // for better gameplay expirience player will cruoch instantly in air
-            //if (isGrounded)
-            if (IsGrounded(out groundNormal, out groundPosition))
+            
+            
+            bool canUncrouch = CanUncrouch();
+            if (IsGrounded(out _, out _))
             {
                 if (input)
                 {
                     collider.height = Mathf.Lerp(collider.height, crouchColliderHeight,
                         Time.deltaTime * crouchSpeedMultiplier);
-                    //camera.localPosition = Vector3.L
                 }
                 else
                 {
-                    collider.height = Mathf.Lerp(collider.height, initialColliderHeight,
-                        Time.deltaTime * crouchSpeedMultiplier);
+                    if (canUncrouch)
+                        collider.height = Mathf.Lerp(collider.height, initialColliderHeight,
+                            Time.deltaTime * crouchSpeedMultiplier);
                 }
             }
             else
@@ -263,6 +267,7 @@ namespace Character
                 collider.height = input ? crouchColliderHeight : initialColliderHeight;
             }
 
+            // for better gameplay experience player will crouch instantly in air
             if (input)
             {
                 cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, crouchCameraCenter,
@@ -270,9 +275,29 @@ namespace Character
             }
             else
             {
-                cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, initialCameraPosition,
-                    Time.deltaTime * crouchSpeedMultiplier);
+                if (canUncrouch)
+                    cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, initialCameraPosition,
+                        Time.deltaTime * crouchSpeedMultiplier);
             }
+        }
+
+        private bool CanUncrouch()
+        {
+            float distanceToPoint = GetCapsulePointDistance();
+            Ray ray = new Ray(transform.position + Vector3.up * distanceToPoint + ceilingSphereCenter, Vector3.up);
+            RaycastHit[] hits = new RaycastHit[maxCollisionsHandle];
+            int size = Physics.SphereCastNonAlloc(ray, ceilingSphereRadius, hits, ceilingSphereCastDistance,
+                walkableLayer);
+            if (size <= 0) return true;
+
+            foreach (RaycastHit hit in hits)
+            {
+                if (!hit.collider)
+                    continue;
+                return false;
+            }
+
+            return true;
         }
 
 
@@ -283,6 +308,7 @@ namespace Character
 
         private bool IsGrounded(out Vector3 groundNormal, out Vector3 hitPoint)
         {
+            //TODO: remove hitPoint in future if it will be redundant 
             groundNormal = Vector3.down;
             hitPoint = Vector3.zero;
             RaycastHit[] hits = new RaycastHit[maxCollisionsHandle];
@@ -290,16 +316,26 @@ namespace Character
 
             // cant calculate it once at start because player can crouch
             float distanceToPoint = GetCapsulePointDistance();
-            Physics.SphereCastNonAlloc(transform.position + Vector3.down * distanceToPoint + groundSphereCenter,
+            /*Physics.SphereCastNonAlloc(transform.position + Vector3.down * distanceToPoint + groundSphereCenter,
                 groundSphereRadius, Vector3.down, hits,
-                groundSphereCastDistance, walkableLayer);
-
-            foreach (RaycastHit hit in hits)
+                groundSphereCastDistance, walkableLayer);*/
+            Ray ray = new Ray(transform.position + Vector3.down * distanceToPoint + groundSphereCenter, Vector3.down);
+            int size = Physics.SphereCastNonAlloc(ray, groundSphereRadius, hits, groundSphereCastDistance,
+                walkableLayer);
+            if (size > 0)
             {
-                if (!hit.collider)
-                    continue;
-                groundNormal = hit.normal;
-                hitPoint = hit.point;
+                Vector3 normal = Vector3.zero;
+                Vector3 point = Vector3.zero;
+                foreach (RaycastHit hit in hits)
+                {
+                    if (!hit.collider)
+                        continue;
+                    normal += hit.normal;
+                    point += hit.point;
+                }
+
+                groundNormal = normal.normalized;
+                hitPoint = point /= size;
                 return true;
             }
 
@@ -339,64 +375,33 @@ namespace Character
         {
             if (!collider)
                 collider = GetComponent<CapsuleCollider>();
-
-            Gizmos.color = Color.black;
-
+            
             float distanceToPoint = GetCapsulePointDistance();
-            Gizmos.DrawWireSphere(transform.position + Vector3.up * distanceToPoint, collider.radius);
-            Gizmos.DrawWireSphere(transform.position + Vector3.down * distanceToPoint, collider.radius);
-
-
+            
+            // ground sphere visualization
             Gizmos.color = Color.green;
-
-            if (IsGrounded(out groundNormal, out groundPosition))
-                //if (isGrounded)
+            if (IsGrounded(out var groundNormal, out _))
             {
+                Gizmos.color = Color.blue;
+                Vector3 position = transform.position;
+                Gizmos.DrawLine(position + groundSphereCenter,
+                    position + groundSphereCenter + groundNormal);
                 Gizmos.color = Color.red;
-                Gizmos.DrawSphere(groundPosition, 0.125f);
-                Gizmos.DrawLine(transform.position + groundSphereCenter,
-                    transform.position + groundSphereCenter + groundNormal);
             }
-
+            
+            
             Gizmos.DrawWireSphere(transform.position + Vector3.down * distanceToPoint + groundSphereCenter,
                 groundSphereRadius);
-        }
-
-        private void UpdateIsGrounded(Collision collision)
-        {
-            /*isGrounded = false;
-            foreach (ContactPoint contact in collision.contacts)
+            
+            // ceiling sphere visualization
+            Gizmos.color = Color.green;
+            if (CanUncrouch())
             {
-                // check if contact is in ground sphere
-                Vector3 contactPosition = contact.point;
-                Vector3 sphereCenter = transform.position + groundSphereCenter;
-                Vector3 delta = sphereCenter - contactPosition;
-
-                if (delta.sqrMagnitude <= groundSphereRadius * groundSphereRadius)
-                {
-                    // this is ground collision
-                    // so set isGrounded to true
-                    isGrounded = true;
-                    groundNormal = contact.normal;
-                    groundPosition = contact.point;
-                    break;
-                }
-            }*/
-        }
-
-        private void OnCollisionStay(Collision collision)
-        {
-            UpdateIsGrounded(collision);
-        }
-
-        private void OnCollisionExit(Collision collision)
-        {
-            UpdateIsGrounded(collision);
-        }
-
-        private void OnCollisionEnter(Collision collision)
-        {
-            UpdateIsGrounded(collision);
+                Gizmos.color = Color.red;
+            }
+            
+            Gizmos.DrawWireSphere(transform.position + Vector3.up * distanceToPoint + ceilingSphereCenter,
+                ceilingSphereRadius);
         }
     }
 }
