@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Level.Single_Instance;
-using To_Be_Sorted;
+using SingleInstance;
 using UnityEngine;
 using Util;
 
@@ -66,8 +65,10 @@ namespace Character
 
         private InputManagerOld inputManager;
 
-        //private bool isGrounded;
         private bool isGroundedInPreviousFrame;
+
+        private bool isCrouching;
+        //private bool wasCrouchingBeforeJump;
 
         private float initialColliderHeight;
 
@@ -80,7 +81,7 @@ namespace Character
 
         void Start()
         {
-            inputManager = GameObject.Find(Settings.GameObjects.GlobalController).GetComponent<InputManagerOld>();
+            inputManager = GameObject.Find(Settings.Settings.GameObjects.GlobalController).GetComponent<InputManagerOld>();
 
             rigidbody = GetComponent<Rigidbody>();
             collider = GetComponent<CapsuleCollider>();
@@ -101,12 +102,12 @@ namespace Character
         private void Control()
         {
             velocity = rigidbody.velocity;
-            MoveControl(inputManager.move, inputManager.isCrouchPressed);
+            MoveControl(inputManager.move);
             LookControl(inputManager.look);
             CrouchControl(inputManager.isCrouchPressed);
         }
 
-        private void MoveControl(Vector3 input, bool isCrouchPressed)
+        private void MoveControl(Vector3 input)
         {
             Vector3 accelerateDirection = GetMovementDirection(input);
 
@@ -116,10 +117,10 @@ namespace Character
 
             if (isGrounded) //ground movements
             {
-                bool isWalkableGround = Vector3.Angle(groundNormal, Vector3.up) <= slideAngle;
+                bool isWalkableGround = Vector3.Angle(groundNormal, Vector3.up) < slideAngle;
                 if (isWalkableGround)
                 {
-                    Acceleration(accelerateDirection, isCrouchPressed ? moveSpeed * 0.25f : moveSpeed);
+                    Acceleration(accelerateDirection, isCrouching ? moveSpeed * 0.25f : moveSpeed);
                     velocity = Vector3.ProjectOnPlane(velocity, groundNormal);
 
                     if (isGroundedInPreviousFrame && !inputManager.isJumpPressed)
@@ -129,7 +130,7 @@ namespace Character
 
                     if (inputManager.isJumpPressed)
                     {
-                        velocity += Gravity.up * (isCrouchPressed ? jumpForce * 0.5f : jumpForce);
+                        velocity += Gravity.up * (isCrouching ? jumpForce * 0.5f : jumpForce);
                     }
                 }
                 else
@@ -137,9 +138,6 @@ namespace Character
                     //Slide down
                     velocity += Gravity.down * (Time.deltaTime * gravityMultiplier);
                 }
-
-                //isGroundedInPreviousFrame = isGrounded;
-                //Q3 Jump control moved to a separate function (JumpControl(bool, bool))
             }
             else //air movement
             {
@@ -150,7 +148,6 @@ namespace Character
                 if (Math.Abs(input.y) > inputThreshold)
                 {
                     AirControl(accelerateDirection);
-                    //ApplyAirControl(ref velocity, accelerateDirection, Time.deltaTime);
                 }
 
                 velocity += Gravity.down * (Time.deltaTime * gravityMultiplier);
@@ -245,30 +242,37 @@ namespace Character
 
         private void CrouchControl(bool input)
         {
-            
-            
             bool canUncrouch = CanUncrouch();
             if (IsGrounded(out _, out _))
             {
                 if (input)
                 {
+                    isCrouching = true;
                     collider.height = Mathf.Lerp(collider.height, crouchColliderHeight,
                         Time.deltaTime * crouchSpeedMultiplier);
                 }
                 else
                 {
                     if (canUncrouch)
+                    {
+                        isCrouching = false;
                         collider.height = Mathf.Lerp(collider.height, initialColliderHeight,
                             Time.deltaTime * crouchSpeedMultiplier);
+                    }
                 }
             }
             else
             {
-                collider.height = input ? crouchColliderHeight : initialColliderHeight;
+                // for better gameplay experience player will crouch instantly in air
+                if (canUncrouch)
+                {
+                    isCrouching = input;
+                    collider.height = input ? crouchColliderHeight : initialColliderHeight;
+                }
             }
 
-            // for better gameplay experience player will crouch instantly in air
-            if (input)
+            // camera movement
+            if (isCrouching)
             {
                 cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, crouchCameraCenter,
                     Time.deltaTime * crouchSpeedMultiplier);
@@ -375,9 +379,9 @@ namespace Character
         {
             if (!collider)
                 collider = GetComponent<CapsuleCollider>();
-            
+
             float distanceToPoint = GetCapsulePointDistance();
-            
+
             // ground sphere visualization
             Gizmos.color = Color.green;
             if (IsGrounded(out var groundNormal, out _))
@@ -388,18 +392,18 @@ namespace Character
                     position + groundSphereCenter + groundNormal);
                 Gizmos.color = Color.red;
             }
-            
-            
+
+
             Gizmos.DrawWireSphere(transform.position + Vector3.down * distanceToPoint + groundSphereCenter,
                 groundSphereRadius);
-            
+
             // ceiling sphere visualization
             Gizmos.color = Color.green;
             if (CanUncrouch())
             {
                 Gizmos.color = Color.red;
             }
-            
+
             Gizmos.DrawWireSphere(transform.position + Vector3.up * distanceToPoint + ceilingSphereCenter,
                 ceilingSphereRadius);
         }

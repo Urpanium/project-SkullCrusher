@@ -1,105 +1,45 @@
 ﻿using UnityEngine;
 
-
-public class InputManagerOld : MonoBehaviour
+namespace SingleInstance
 {
-    public enum Device
+    public class InputManagerOld : MonoBehaviour
     {
-        Touch = 0,
-        PC = 1,
-        GamepadDualShock = 2,
-        GamepadXboxOne = 3,
-        GamepadXbox360 = 4,
-        GamepadNintendoSwitch = 5,
-        Custom = 6
-    }
+        [Header("Read-only")] public Vector3 move;
+        public Vector3 look;
 
-    public Device inputDevice;
-    
+        public bool isCrouchPressed;
+        public bool isJumpPressed;
+        public bool isInteractPressed;
 
-    [Header("Read-only")] public Vector3 move;
-    public float moveInputSpeedModificator;
-    public Vector3 look;
+        public bool isFire1Pressed;
+        public bool isFire2Pressed;
 
-    public bool isCrouchPressed;
-    public bool isJumpPressed;
-    public bool isInteractPressed;
-
-
-    //TOUCH 
-    /*public OffsetJoystick joystick;
-    public LookPanel lookPanel;
-    public ActionButton actionButton;
-    public JumpButton jumpButton;*/
-
-    void Start()
-    {
-        /*joystick = GameObject.Find("Offset Joystick Panel").GetComponent<OffsetJoystick>();
-        lookPanel = GameObject.Find("Look Panel").GetComponent<LookPanel>();*/
-    }
-
-    void Update()
-    {
-        Control(inputDevice);
-    }
-
-    void Control(Device device)
-    {
-        Vector3 moveVector;
-        Vector3 lookVector;
-        float moveVertical = 0.0f, moveHorizontal = 0.0f;
-        float lookVertical = 0.0f, lookHorizontal = 0.0f;
-
-        switch (inputDevice)
+        void Update()
         {
-            //TODO: make touch control
-            case Device.Touch:
-            {
-                //move = joystick.joystickValue;
-                //look = lookPanel.deltaLook;
-                /*moveHorizontal = joystick.joystickValue.x;
-                moveVertical = joystick.joystickValue.y;
-
-                lookHorizontal = lookPanel.deltaLook.x;
-                lookVertical = lookPanel.deltaLook.y;
-                isJumpPressed = jumpButton.touchedInThisFrame;
-
-                moveInputSpeedModificator = joystick.joustickProgress;*/
-                break;
-            }
-            case Device.PC:
-            {
-                moveVertical = Input.GetAxis("Vertical");
-                moveHorizontal = Input.GetAxis("Horizontal");
-                lookVertical = Input.GetAxis("Mouse Y");
-                lookHorizontal = Input.GetAxis("Mouse X");
-                if (Input.GetAxis("Jump") > 0.5f)
-                    isJumpPressed = true;
-                else
-                    isJumpPressed = false;
-
-                if (Input.GetAxis("Crouch") > 0.5f)
-                    isCrouchPressed = true;
-                else
-                    isCrouchPressed = false;
-
-                if (Input.GetAxis("Interact") > 0.5f)
-                    isInteractPressed = true;
-                else
-                    isInteractPressed = false;
-
-                moveInputSpeedModificator = 1.0f;
-                break;
-            }
-            case Device.GamepadXbox360:
-            {
-                break;
-            }
-            //TODO: добавить поддержку геймпадов
+            Control();
         }
 
+        void Control()
+        {
+            var moveVertical = Input.GetAxis("Vertical");
+            var moveHorizontal = Input.GetAxis("Horizontal");
+            
+            var lookVertical = Input.GetAxis("Mouse Y");
+            var lookHorizontal = Input.GetAxis("Mouse X");
+            isJumpPressed = Input.GetAxis("Jump") > 0.5f;
 
-        move = new Vector3(moveHorizontal, moveVertical);
-        look = new Vector3(lookHorizontal, lookVertical);
+            isCrouchPressed = Input.GetAxis("Crouch") > 0.5f;
+
+            isInteractPressed = Input.GetAxis("Interact") > 0.5f;
+
+            isFire1Pressed = Input.GetAxis("Fire1") > 0.5f;
+
+            // is both mouse buttons pressed, then we will count this as Fire1
+            isFire2Pressed = Input.GetAxis("Fire2") > 0.5f && !isFire1Pressed;
+
+
+            move = new Vector3(moveHorizontal, moveVertical);
+            look = new Vector3(lookHorizontal, lookVertical);
+        }
     }
 }

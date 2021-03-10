@@ -1,7 +1,6 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Level.Single_Instance
+namespace SingleInstance
 {
     public class InputManager : MonoBehaviour
     {

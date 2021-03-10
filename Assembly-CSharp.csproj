@@ -54,10 +54,15 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\IK\IK.cs" />
      <Compile Include="Assets\Scripts\Character\Controller.cs" />
+     <Compile Include="Assets\Scripts\Weapon\WeaponParameters.cs" />
      <Compile Include="Assets\Scripts\Util\Gravity.cs" />
+     <Compile Include="Assets\Scripts\Weapon\Shutter\ShutterParameters.cs" />
      <Compile Include="Assets\Scripts\IK\ManualIK.cs" />
      <Compile Include="Assets\Scripts\SingleInstance\InputManager.cs" />
+     <Compile Include="Assets\Scripts\Weapon\Shutter\Shutter.cs" />
      <Compile Include="Assets\Scripts\SingleInstance\InputManagerOld.cs" />
+     <Compile Include="Assets\Scripts\Weapon\Weapon.cs" />
+     <Compile Include="Assets\Scripts\Weapon\BulletDamageParameters.cs" />
      <Compile Include="Assets\Scripts\Util\Vector3Util.cs" />
      <Compile Include="Assets\Scripts\Settings\Settings.cs" />
      <None Include="Assets\Shaders\Surface Diffuse.shader" />
