@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Preferences;
 using SingleInstance;
 using UnityEngine;
 using Util;
@@ -10,7 +11,7 @@ namespace Character
     [RequireComponent(typeof(Rigidbody))]
     public class Controller : MonoBehaviour
     {
-        public Transform camera;
+        public Transform cameraTransform;
 
         [Header("Movement")] public float moveSpeed = 10.0f;
 
@@ -71,8 +72,7 @@ namespace Character
         //private bool wasCrouchingBeforeJump;
 
         private float initialColliderHeight;
-
-        private Transform cameraTransform;
+        
         private Vector3 initialCameraPosition;
 
         private Rigidbody rigidbody;
@@ -81,12 +81,12 @@ namespace Character
 
         void Start()
         {
-            inputManager = GameObject.Find(Settings.Settings.GameObjects.GlobalController).GetComponent<InputManagerOld>();
+            inputManager = GameObject.Find(Settings.GameObjects.GlobalController).GetComponent<InputManagerOld>();
 
             rigidbody = GetComponent<Rigidbody>();
             collider = GetComponent<CapsuleCollider>();
 
-            cameraTransform = camera.transform;
+            
             initialColliderHeight = collider.height;
             initialCameraPosition = cameraTransform.localPosition;
 
@@ -365,7 +365,7 @@ namespace Character
 
         private Vector3 GetMovementRight()
         {
-            return camera.transform.right;
+            return cameraTransform.transform.right;
         }
 
         private float GetCapsulePointDistance()

@@ -54,17 +54,21 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\IK\IK.cs" />
      <Compile Include="Assets\Scripts\Character\Controller.cs" />
-     <Compile Include="Assets\Scripts\Weapon\WeaponParameters.cs" />
+     <Compile Include="Assets\Scripts\Weapons\WeaponParameters.cs" />
      <Compile Include="Assets\Scripts\Util\Gravity.cs" />
-     <Compile Include="Assets\Scripts\Weapon\Shutter\ShutterParameters.cs" />
+     <Compile Include="Assets\Scripts\Weapons\Shutter\ShutterParameters.cs" />
      <Compile Include="Assets\Scripts\IK\ManualIK.cs" />
      <Compile Include="Assets\Scripts\SingleInstance\InputManager.cs" />
-     <Compile Include="Assets\Scripts\Weapon\Shutter\Shutter.cs" />
+     <Compile Include="Assets\Scripts\Character\WeaponManager.cs" />
+     <Compile Include="Assets\Scripts\Weapons\Shutter\Shutter.cs" />
      <Compile Include="Assets\Scripts\SingleInstance\InputManagerOld.cs" />
-     <Compile Include="Assets\Scripts\Weapon\Weapon.cs" />
-     <Compile Include="Assets\Scripts\Weapon\BulletDamageParameters.cs" />
+     <Compile Include="Assets\Scripts\Weapons\Weapon.cs" />
+     <Compile Include="Assets\Scripts\AI\HumanAI.cs" />
+     <Compile Include="Assets\Scripts\Weapons\BulletParameters.cs" />
      <Compile Include="Assets\Scripts\Util\Vector3Util.cs" />
-     <Compile Include="Assets\Scripts\Settings\Settings.cs" />
+     <Compile Include="Assets\Scripts\Preferences\Settings.cs" />
+     <Compile Include="Assets\Scripts\Weapons\BulletManager.cs" />
+     <Compile Include="Assets\Scripts\Weapons\Bullet.cs" />
      <None Include="Assets\Shaders\Surface Diffuse.shader" />
  <Reference Include="UnityEngine">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2020.2.0f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>

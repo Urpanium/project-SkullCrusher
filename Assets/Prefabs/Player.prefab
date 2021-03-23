@@ -92,7 +92,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2753181242597939156}
-  - component: {fileID: 2753181242597939157}
   - component: {fileID: 2753181242597939158}
   - component: {fileID: 6324707457978266414}
   - component: {fileID: 2753181242597939159}
@@ -118,19 +117,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
---- !u!65 &2753181242597939157
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2753181242597939152}
-  m_Material: {fileID: 13400000, guid: c1c99fc3f41e2154b82db5106141a04b, type: 2}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 2, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &2753181242597939158
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -173,12 +159,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 039e5fb9cbdc4538b6150f504542ae38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camera: {fileID: 2753181243282720595}
+  cameraTransform: {fileID: 0}
   moveSpeed: 16
   groundAccelerationSpeed: 6
   jumpForce: 6
-  groundBoxCenter: {x: 0, y: -1, z: 0}
-  groundBoxSize: {x: 1, y: 0.02, z: 1}
+  groundSphereCenter: {x: 0, y: -1, z: 0}
+  groundSphereRadius: 0.5
+  groundSphereCastDistance: 0.05
   slideAngle: 45
   friction: 10
   airAccelerationSpeed: 1
@@ -189,6 +176,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   gravityMultiplier: 10
+  crouchColliderHeight: 0.5
+  crouchSpeedMultiplier: 1
+  crouchCameraCenter: {x: 0, y: 0.25, z: 0}
+  ceilingSphereCenter: {x: 0, y: 0, z: 0}
+  ceilingSphereRadius: 0.5
+  ceilingSphereCastDistance: 0.1
   sensitivity: 10
   invertX: 0
   invertY: 0
