@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Character;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace Weapons
@@ -7,6 +8,7 @@ namespace Weapons
     {
         public Vector3 offset = new Vector3(0.35f, -0.47f, 0.60f);
 
+        public Controller controller;
         public WeaponParameters weaponParameters;
 
         public BulletParameters bulletParameters;
@@ -88,6 +90,8 @@ namespace Weapons
             currentClipAmmoAmount--;
             // restart the timer
             currentTimePerShot = timePerShot;
+            shutter.OnShoot();
+            
             fire1Event.Invoke();
         }
 
@@ -116,15 +120,14 @@ namespace Weapons
         public void EjectShell()
         {
             // shell spawn and ejection
-            Transform shell = Instantiate(shellPrefab);
+            Transform shell = Instantiate(shellPrefab, ejector.position, ejector.rotation);
             Rigidbody shellRigidbody = shell.GetComponent<Rigidbody>();
-            shellRigidbody.velocity = ejector.forward * shellInitialVelocityMultiplier; 
+            shellRigidbody.velocity = shellInitialVelocityMultiplier * shellRigidbody.mass * ejector.forward + controller.GetVelocity(); 
         }
 
 
         private bool CanFire()
         {
-            
             return currentClipAmmoAmount > 0 && currentTimePerShot <= 0;
         }
 

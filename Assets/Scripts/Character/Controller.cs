@@ -375,6 +375,11 @@ namespace Character
             return v;
         }
 
+        public Vector3 GetVelocity()
+        {
+            return velocity;
+        }
+
         private void OnDrawGizmos()
         {
             if (!collider)

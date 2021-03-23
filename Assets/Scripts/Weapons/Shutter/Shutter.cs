@@ -1,13 +1,17 @@
-﻿using UnityEngine;
+﻿using Character;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace Weapons.Shutter
 {
     public class Shutter : MonoBehaviour
     {
+        
+        
         public ShutterParameters shutterParameters;
 
         public UnityEvent onRollBack;
+        
         
         // [0..1]
         private float shutterPositionValue = 0.0f;
@@ -40,7 +44,7 @@ namespace Weapons.Shutter
             shutterPositionValue = Mathf.Clamp01(shutterPositionValue);
 
             transform.localPosition =
-                Vector3.Lerp(initialPosition, shutterPositionInFullRollBack, shutterPositionValue);
+                Vector3.Lerp(initialPosition,  initialPosition + shutterParameters.slideDistance * -1 * Vector3.forward, shutterPositionValue);
 
             if (shutterPositionValue >= 1 - Mathf.Epsilon)
             {
