@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Preferences;
 using SingleInstance;
 using UnityEngine;
@@ -200,7 +199,6 @@ namespace Character
             if (dot > 0)
             {
                 float k = airControlAccuracy * dot * dot * Time.deltaTime;
-                //TODO: понять чё это значит
                 bool isPureForward =
                     Math.Abs(inputManager.move.x) < inputThreshold && Math.Abs(inputManager.move.y) > 0;
                 if (isPureForward)

@@ -1,4 +1,5 @@
 ﻿using Character;
+using Preferences;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -31,15 +32,25 @@ namespace Weapons
 
         // will be spawned in ejector
         public Transform shellPrefab;
+        public Transform bulletPrefab;
+
+        // TODO: ???
+        public Transform clip;
 
         public float shellInitialVelocityMultiplier = 1.0f;
+        public float shellInitialAngularVelocityMultiplier = 1.0f;
 
 
         public int currentClipAmmoAmount;
         public int currentRemainedAmmoAmount; // does not include currentClipAmmoAmount
 
-        [Header("Gizmo settings")] public int gizmoEjectionTrajectorySamples = 120;
+        [Header("Gizmo settings")] public int gizmoShellEjectionTrajectorySamples = 120;
 
+        /*
+         * ================================PRIVATE================================
+         */
+
+        private BulletManager bulletManager;
 
         private float timePerShot;
 
@@ -50,6 +61,8 @@ namespace Weapons
 
         private void Start()
         {
+            bulletManager = GameObject.Find(Settings.GameObjects.GlobalController).GetComponent<BulletManager>();
+
             timePerShot = weaponParameters.clipShootOutTime / weaponParameters.clipAmmoAmount;
             currentTimePerShot = timePerShot;
 
@@ -79,24 +92,36 @@ namespace Weapons
             //print("Firing!");
             if (!CanFire())
                 return;
-            // raycast bullet
-
-
-            // shutter slide
-
-
-            // values update
+            
             // decrease clip ammo amount
             currentClipAmmoAmount--;
             // restart the timer
             currentTimePerShot = timePerShot;
+            
             shutter.OnShoot();
             
             fire1Event.Invoke();
+
+            Transform bulletTransform = MakeBullet();
+            Bullet bullet = bulletTransform.gameObject.AddComponent<Bullet>();
+            bullet.parameters = bulletParameters;
+            bullet.seed = currentClipAmmoAmount;
+            bullet.ricochetChance = bulletParameters.initialRicochetChance;
+            //bullet.ricochetChance = bulletParameters.initialRicochetChance;
+            //bullet.maxRicochetAngle = bulletParameters.maxRicochetAngle;
+            //TODO: check this
+            bulletManager.AddBullet(bullet);
         }
+
+        private Transform MakeBullet()
+        {
+            return Instantiate(bulletPrefab, muzzle.position, muzzle.rotation);
+        }
+        
 
         public void StandardFire2()
         {
+            //TODO: Remove?
             // just do nothing 
         }
 
@@ -108,7 +133,7 @@ namespace Weapons
 
         private void OnNewShotReady()
         {
-            //TODO: remove?
+            // TODO: remove?
             onNewShotReadyEvent.Invoke();
         }
 
@@ -120,9 +145,13 @@ namespace Weapons
         public void EjectShell()
         {
             // shell spawn and ejection
-            Transform shell = Instantiate(shellPrefab, ejector.position, ejector.rotation);
+            Transform shell = Instantiate(shellPrefab, ejector.position, Random.rotation);
             Rigidbody shellRigidbody = shell.GetComponent<Rigidbody>();
-            shellRigidbody.velocity = shellInitialVelocityMultiplier * shellRigidbody.mass * ejector.forward + controller.GetVelocity(); 
+            shellRigidbody.velocity = shellInitialVelocityMultiplier * shellRigidbody.mass * ejector.forward +
+                                      controller.GetVelocity();
+            shellRigidbody.rotation = ejector.rotation;
+            shellRigidbody.angularVelocity =
+                Random.onUnitSphere * shellRigidbody.mass * shellInitialAngularVelocityMultiplier;
         }
 
 
@@ -150,8 +179,11 @@ namespace Weapons
                     // draw normal
                     // Gizmos.DrawLine(hit.point, hit.point + hit.normal);
                     // draw possible ricochet direction
-                    Vector3 ricochetedDirection = Quaternion.AngleAxis(180, hit.normal) * muzzle.forward;
-                    Gizmos.DrawLine(hit.point, hit.point + ricochetedDirection * -1);
+                    if (hit.collider.gameObject.tag.Equals(Settings.Tags.Ricochetable))
+                    {
+                        Vector3 ricochetedDirection = Quaternion.AngleAxis(180, hit.normal) * muzzle.forward * -1;
+                        Gizmos.DrawLine(hit.point, hit.point + ricochetedDirection);
+                    }
                 }
                 else
                 {
@@ -166,7 +198,7 @@ namespace Weapons
 
                 Vector3 position = ejector.position;
                 Vector3 velocity = ejector.forward * shellInitialVelocityMultiplier;
-                float samplesInverted = 1.0f / gizmoEjectionTrajectorySamples;
+                float samplesInverted = 1.0f / gizmoShellEjectionTrajectorySamples;
 
                 Gizmos.DrawSphere(position, 0.03125f);
 

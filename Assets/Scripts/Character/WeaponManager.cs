@@ -1,5 +1,4 @@
-﻿using System;
-using Preferences;
+﻿using Preferences;
 using SingleInstance;
 using UnityEngine;
 using Weapons;
@@ -29,7 +28,7 @@ namespace Character
         {
             if (currentWeaponTransform)
             {
-                //TODO: remove?
+                // TODO: remove?
                 currentWeaponTransform.rotation = cameraTransform.rotation;
             }
 

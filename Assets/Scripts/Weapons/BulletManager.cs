@@ -1,5 +1,8 @@
-﻿using Preferences;
+﻿using System;
+using System.Collections.Generic;
+using Preferences;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Weapons
 {
@@ -7,52 +10,104 @@ namespace Weapons
     public class BulletManager : MonoBehaviour
     {
         public LayerMask shootableMask;
+        public float bulletTimeout = 60.0f;
+
+        private List<Bullet> bullets;
+
+        private void Start()
+        {
+            bullets = new List<Bullet>();
+        }
 
 
         private void Update()
         {
             //TODO: update bullets
+            for (int i = 0; i < bullets.Count; i++)
+            {
+                bool destroyed = UpdateBullet(bullets[i]);
+                if (destroyed) i--;
+            }
         }
 
-        private void UpdateBullet(Bullet bullet)
+
+        private bool UpdateBullet(Bullet bullet)
         {
+            bullet.flyingTime += Time.deltaTime;
+            if (bullet.flyingTime > bulletTimeout)
+            {
+                bullets.Remove(bullet);
+                Destroy(bullet.gameObject);
+                return true;
+            }
+
             Transform bulletTransform = bullet.transform;
 
             Vector3 direction = bulletTransform.forward;
             float distance = bullet.parameters.speed * Time.deltaTime;
+            Vector3 offset = distance * direction;
+            //bulletTransform.position += offset;
 
             // cast a ray to check if we skipping some object
-            Ray ray = new Ray(transform.position, direction);
+            // this check must be made after we calculate next bullet position
+            // fucked this up and lost hours to figure it out
+            Ray ray = new Ray(bulletTransform.position, direction);
             RaycastHit hit;
+
             if (Physics.SphereCast(ray, bullet.parameters.radius, out hit, distance, shootableMask))
             {
                 Vector3 normal = hit.normal;
-                float angle = Vector3.Angle(normal, direction);
+                // - 90 because of normal
+                float angle = Vector3.Angle(normal, direction) - 90;
                 // if we hit something that can ricochet our bullet
                 // and angle fits
                 // TODO: also add hitting enemy / player case
-                if (hit.transform.tag.Equals(Settings.Tags.Ricochetable) &&
-                    angle <= bullet.maxRicochetAngle)
+                if (hit.transform.tag.Equals(Settings.Tags.Ricochetable))
                 {
                     Random.InitState(bullet.seed);
 
                     float chance = bullet.ricochetChance *
-                                   (1 - (bullet.maxRicochetAngle - angle) / bullet.maxRicochetAngle);
-                    if (Random.value < chance)
+                                   ((bullet.parameters.maxRicochetAngle - angle) /
+                                       bullet.parameters.maxRicochetAngle);
+                    // try ricochet
+                    //print("chance: " + chance);
+                    if (Random.value < chance &&
+                        angle <= bullet.parameters.maxRicochetAngle)
                     {
-                        bulletTransform.forward = Quaternion.AngleAxis(90, hit.normal) * bulletTransform.forward;
-                    }
-                    else
-                    {
-                        //TODO: show some particles and destroy bullet
-                        Destroy(bullet.transform);
+                        bulletTransform.forward = Quaternion.AngleAxis(180, hit.normal) * bulletTransform.forward * -1;
+                        // push bullet out of plane a little bit
+                        bulletTransform.position = hit.point + hit.normal * bullet.parameters.radius;
+                        return false;
                     }
                 }
+                
             }
             else
             {
-                Vector3 offset = distance * direction;
+                // move bullet
                 bulletTransform.position += offset;
+                return false;
+            }
+
+            //TODO: show some particles and destroy bullet
+            Destroy(bullet.gameObject);
+            return true;
+        }
+
+
+        public void AddBullet(Bullet bullet)
+        {
+            bullets.Add(bullet);
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.red;
+            foreach (var t in bullets)
+            {
+                Gizmos.DrawSphere(t.transform.position, t.parameters.radius);
+                Gizmos.DrawLine(t.transform.position,
+                    t.transform.position + t.transform.forward * (Time.deltaTime * t.parameters.speed));
             }
         }
     }
