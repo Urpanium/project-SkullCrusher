@@ -15,7 +15,7 @@ TagManager:
   - Weapon
   - Ignore Player
   - Weapon Render
-  - Garbage
+  - PostProcessing
   - 
   - 
   - 
