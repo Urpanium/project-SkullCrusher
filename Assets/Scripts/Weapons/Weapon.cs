@@ -17,6 +17,7 @@ namespace Weapons
         public UnityEvent fire1Event; // default fire
         public UnityEvent fire2Event; // alternative fire
         public UnityEvent reloadEvent;
+        public UnityEvent onReloadStartedEvent;
         public UnityEvent onReloadedEvent;
         public UnityEvent onNewShotReadyEvent;
 
@@ -34,7 +35,7 @@ namespace Weapons
         public Transform shellPrefab;
         public Transform bulletPrefab;
 
-        // TODO: ???
+        // TODO: can attach rigidbody to it 
         public Transform clip;
 
         public float shellInitialVelocityMultiplier = 1.0f;
@@ -63,7 +64,7 @@ namespace Weapons
         {
             bulletManager = GameObject.Find(Settings.GameObjects.GlobalController).GetComponent<BulletManager>();
 
-            timePerShot = weaponParameters.clipShootOutTime / weaponParameters.clipAmmoAmount;
+            
             currentTimePerShot = timePerShot;
 
             currentClipAmmoAmount = weaponParameters.clipAmmoAmount;
@@ -72,6 +73,9 @@ namespace Weapons
 
         private void Update()
         {
+            //TODO: consider removing on release
+            timePerShot = 1 / weaponParameters.shootRate;
+            
             if (currentTimePerShot > 0)
             {
                 currentTimePerShot -= Time.deltaTime;
@@ -127,8 +131,12 @@ namespace Weapons
 
         public void StandardReload()
         {
-            currentReloadTime = weaponParameters.reloadTime;
-            // TODO: start reloading animations etc.
+            if (currentReloadTime <= 0)
+            {
+                currentReloadTime = weaponParameters.reloadTime;
+                // start reloading animation
+                onReloadStartedEvent.Invoke();
+            }
         }
 
         private void OnNewShotReady()

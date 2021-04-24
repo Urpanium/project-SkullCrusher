@@ -7,7 +7,7 @@ namespace Weapons
     {
         public int clipAmmoAmount; // currently in weapon
         public int totalAmmoAmount; // TotalAmmo (including those that are in clip)
-        public float clipShootOutTime;
+        public float shootRate;
         public float reloadTime;
     }
 }

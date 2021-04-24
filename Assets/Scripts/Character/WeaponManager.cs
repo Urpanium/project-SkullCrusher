@@ -1,4 +1,5 @@
-﻿using Preferences;
+﻿using System.Collections.Generic;
+using Preferences;
 using SingleInstance;
 using UnityEngine;
 using Weapons;
@@ -12,6 +13,8 @@ namespace Character
 
 
         private InputManagerOld inputManager;
+
+        private List<Weapon> weapons;
         
         private Weapon currentWeapon;
         private Transform currentWeaponTransform;

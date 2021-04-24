@@ -110,7 +110,6 @@
                 //float4 maskColor = mask_box_blur(uv);
 
                 float glitchMask = maskColor.a;
-                float glitch = maskColor.a * _ArtifactIntensity * pow(length(maskColor.rgb), 2);
                 float2 uvPixelized = float2(pixelate_uv_dimension(uv.x, _ScreenParams.x, glitchMask),
                                             pixelate_uv_dimension(uv.y, _ScreenParams.y, glitchMask));
 
@@ -123,14 +122,16 @@
 
                 float4 pixelMaskColor = tex2D(_Mask, uvPixelized);
 
-                glitch = pixelMaskColor.a * _ArtifactIntensity;
+                float glitch = pixelMaskColor.a * _ArtifactIntensity;
+                // additive variant
                 float3 blended = height_blend(pixelCameraColor, 1 - glitch,
+                                              clamp(aColor1 + pixelCameraColor.r, 0, 1), glitch * pixelMaskColor.r,
+                                              clamp(aColor2 + pixelCameraColor.g, 0, 1), glitch * pixelMaskColor.g,
+                                              clamp(aColor3 + pixelCameraColor.b, 0, 1), glitch * pixelMaskColor.b);
+                /*float3 blended = height_blend(pixelCameraColor, 1 - glitch,
                                               aColor1, glitch * pixelMaskColor.r,
                                               aColor2, glitch * pixelMaskColor.g,
-                                              aColor3, glitch * pixelMaskColor.b);
-                //sablended += random_vector * _NoiseIntensity * glitch;
-                //return glitch;
-                //return maskColor;
+                                              aColor3, glitch * pixelMaskColor.b);*/
                 return float4(blended, 1);
             }
             ENDCG
