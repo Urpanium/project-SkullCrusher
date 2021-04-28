@@ -93,7 +93,6 @@ namespace Weapons
 
         public void StandardFire1()
         {
-            //print("Firing!");
             if (!CanFire())
                 return;
             
