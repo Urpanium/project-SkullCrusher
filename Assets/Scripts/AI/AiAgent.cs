@@ -151,7 +151,8 @@ namespace AI
 
         public void StopMoving()
         {
-            targetMovePosition = transform.position;
+            //targetMovePosition = transform.position;
+            GoTo(transform.position);
         }
         
 
@@ -203,7 +204,7 @@ namespace AI
                 Vector3[] castPoints = GetBoundsPoints(playerParts[i].bounds);
                 for (int j = 0; j < castPoints.Length; j++)
                 {
-                    float visibility = GetVisibilityOfPoint(castPoints[j]);
+                    float visibility = GetVisibilityOfPoint(headTransform, castPoints[j]);
                     result += visibility * perPointMultiplier;
                 }
             }
@@ -214,19 +215,26 @@ namespace AI
             return result * distanceMultiplier;
         }
 
-        private float GetVisibilityOfPoint(Vector3 point)
+        // how good player can see agent
+        public float GetInversePlayerVisibility()
         {
-            Vector3 pointDelta = (point - headTransform.position);
-            float angle = Vector3.Angle(pointDelta.normalized, headTransform.forward);
+            //TODO: maybe make it more complex
+            return GetVisibilityOfPoint(playerTransform.GetChild(0), transform.position);
+        }
+
+        private float GetVisibilityOfPoint(Transform observerHead, Vector3 point)
+        {
+            Vector3 pointDelta = (point - observerHead.position);
+            float angle = Vector3.Angle(pointDelta.normalized, observerHead.forward);
             //float vision = angle <= visionAngle ? 1 : 0;
 
             if (angle > visionAngle) return -1;
 
-            Ray ray = new Ray(headTransform.position, pointDelta);
+            Ray ray = new Ray(observerHead.position, pointDelta);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, visionDistance, visibleObjectsMask))
             {
-                float hitDistance = (hit.point - headTransform.position).magnitude;
+                float hitDistance = (hit.point - observerHead.position).magnitude;
                 float pointDistance = pointDelta.magnitude;
                 if (hitDistance > pointDistance)
                     return 1;
@@ -279,7 +287,7 @@ namespace AI
                 Vector3[] points = GetBoundsPoints(playerParts[i].bounds);
                 for (int j = 0; j < points.Length; j++)
                 {
-                    float visibility = GetVisibilityOfPoint(points[j]);
+                    float visibility = GetVisibilityOfPoint(headTransform, points[j]);
                     float redComponent = Mathf.Clamp01(visibility);
                     float greenComponent = 0;
                     if (visibility < 0)

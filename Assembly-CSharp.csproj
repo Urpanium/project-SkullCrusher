@@ -58,6 +58,7 @@
      <Compile Include="Assets\Scripts\Weapons\WeaponParameters.cs" />
      <Compile Include="Assets\Scripts\PostProcessing\ImageEffect.cs" />
      <Compile Include="Assets\Scripts\Util\Gravity.cs" />
+     <Compile Include="Assets\Scripts\Debug\EscapeHidePointer.cs" />
      <Compile Include="Assets\Scripts\Weapons\Bullet.cs" />
      <Compile Include="Assets\Scripts\Weapons\Shutter\ShutterParameters.cs" />
      <Compile Include="Assets\Scripts\IK\ManualIK.cs" />
@@ -69,12 +70,12 @@
      <Compile Include="Assets\Scripts\Weapons\Weapon.cs" />
      <Compile Include="Assets\Scripts\AI\HumanAiLogic.cs" />
      <Compile Include="Assets\Scripts\Debug\TimeControl.cs" />
+     <Compile Include="Assets\Scripts\Character\GlitchCameraSynchronizer.cs" />
      <Compile Include="Assets\Scripts\Weapons\BulletParameters.cs" />
      <Compile Include="Assets\Scripts\Util\Vector3Util.cs" />
+     <Compile Include="Assets\Scripts\Character\CameraZoom.cs" />
      <Compile Include="Assets\Scripts\Weapons\BulletManager.cs" />
      <Compile Include="Assets\Scripts\Preferences\Settings.cs" />
-     <Compile Include="Assets\Scripts\Character\CameraZoom.cs" />
-     <Compile Include="Assets\Scripts\Character\GlitchCameraSynchronizer.cs" />
      <None Include="Assets\Shaders\PostProcessing\ArtifactImageEffect.shader" />
      <None Include="Assets\Shaders\Surface Diffuse.shader" />
  <Reference Include="UnityEngine">

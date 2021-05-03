@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Numerics;
+using NUnit.Framework;
 using Preferences;
 using UnityEngine;
 using UnityEngine.AI;
@@ -19,6 +21,7 @@ namespace AI
             Idle = 0, // patrols or stands still
             Contact, // player is visible, waiting for spot time to end up (if player is far enough), maybe playing some noises to notify player
             Attacking, // player is spotted, bot's position is convenient to shoot, if not, try to walk to player or distance from him
+            TakingCover, // fires out what remains in weapon's clip while going to nearest cover
             Chasing, // player is not visible, trying to establish contact before time is up, try to walk to player's last position 
             Searching // player is lost, try to search him in nearest positions for a while
         }
@@ -31,6 +34,9 @@ namespace AI
          * Contact -> Idle
          * 
          * (DONE) Attacking -> Chasing (when not enough parts of character's model is visible)
+         * Attacking -> TakingCover (when less than X percent of ammo remained in current clip)
+         *
+         * TakingCover -> Attacking (when reload is done)
          * 
          * (DONE) Chasing -> Searching (when chaseTime is up)
          * (REMOVED) Chasing -> Contact (when player is far enough or not enough parts of character's model is visible)
@@ -50,7 +56,7 @@ namespace AI
         public State state;
         public IdleType idleType;
 
-        [Range(0, 1)] public float instantContactVisibility = 0.9f;
+        [UnityEngine.Range(0, 1)] public float instantContactVisibility = 0.9f;
         public float contactStartVisibility = 0.2f;
         public float chaseStartVisibility = 0.1f;
 
@@ -58,8 +64,16 @@ namespace AI
         public float chaseTime = 10.0f;
         public float searchTime = 20.0f;
         public float searchPointChangeInterval = 15.0f;
-        [Range(1, 15)] public int searchAttemptsCount = 3;
+        [UnityEngine.Range(1, 15)] public int searchAttemptsCount = 3;
         public float searchRadius = 20.0f;
+
+        public float coverSearchDistance = 10.0f;
+        [UnityEngine.Range(1, 15)] public int coverSearchSamples = 5;
+        [UnityEngine.Range(0.01f, 1.99f)] public float coverMinThickness = 0.25f;
+        [UnityEngine.Range(0.02f, 2.0f)] public float coverMaxThickness = 2.0f;
+
+        public LayerMask coverLayerMask;
+
         public Weapon equippedWeapon;
 
 
@@ -113,6 +127,12 @@ namespace AI
                 {
                     AttackingStateUpdate();
                     AttackingStateTransitionCheck();
+                    break;
+                }
+                case State.TakingCover:
+                {
+                    TakingCoverStateUpdate();
+                    TakingCoverStateTransitionCheck();
                     break;
                 }
                 case State.Chasing:
@@ -170,6 +190,7 @@ namespace AI
 
             if (playerVisibility > contactStartVisibility)
             {
+                aiAgent.StopMoving();
                 state = State.Contact;
             }
         }
@@ -185,6 +206,7 @@ namespace AI
             {
                 aiAgent.GoTo(Vector3.Lerp(player.position, transform.position, 0.5f));
             }
+
             // TODO: shoot this motherfucker
         }
 
@@ -196,6 +218,34 @@ namespace AI
                 state = State.Chasing;
             }
         }
+
+        private void TakingCoverStateUpdate()
+        {
+            Vector3 pointToGo;
+            if (!IsInCoverPoint())
+            {
+                if (TryGetCoverPoint(out pointToGo))
+                {
+                    aiAgent.GoTo(pointToGo);
+                    return;
+                }
+
+                print("Can't find cover point");
+
+                if (aiAgent.IsArrivedAtTargetPosition() && TryGetRandomPointToSearch(out pointToGo))
+                {
+                    aiAgent.GoTo(pointToGo);
+                    return;
+                }
+            }
+
+            // well, guess i'll die
+        }
+
+        private void TakingCoverStateTransitionCheck()
+        {
+        }
+
 
         private void ChasingStateUpdate()
         {
@@ -227,6 +277,7 @@ namespace AI
             // we know that player is here so we paying more attention
             if (aiAgent.GetPlayerVisibility() > contactStartVisibility)
             {
+                aiAgent.StopMoving();
                 currentChaseTime = 0.0f;
                 state = State.Attacking;
             }
@@ -265,7 +316,7 @@ namespace AI
                 lookDirection.Normalize();
                 aiAgent.LookAtDirection(lookDirection);
             }
-            
+
             if (currentSearchIntervalTime > searchPointChangeInterval && aiAgent.IsArrivedAtTargetPosition())
             {
                 Vector3 pointToSearch;
@@ -275,7 +326,6 @@ namespace AI
                     currentSearchIntervalTime = 0.0f;
                     aiAgent.GoTo(pointToSearch);
                 }
-                
             }
         }
 
@@ -305,11 +355,13 @@ namespace AI
             Vector3 offset = Random.insideUnitSphere * radius;
             Vector3 horizontalOffset = offset;
             horizontalOffset.y = 0;
-            Ray ray = new Ray(transform.position + Vector3.up * (aiAgent.agentHeight * 0.5f), horizontalOffset);
+            Ray ray1 = new Ray(transform.position + Vector3.up * (aiAgent.agentHeight * 0.5f), horizontalOffset);
+            Ray ray2 = new Ray(transform.position - Vector3.up * (aiAgent.agentHeight * 0.499f), horizontalOffset);
             //RaycastHit hit;
             for (int i = 0; i < searchAttemptsCount; i++)
             {
-                if (!Physics.Raycast(ray, /*out hit,*/ radius, aiAgent.visibleObjectsMask))
+                if (!Physics.Raycast(ray1, /*out hit,*/ radius, aiAgent.visibleObjectsMask)
+                    || !Physics.Raycast(ray2, radius, aiAgent.visibleObjectsMask))
                 {
                     /*float hitDistance = (hit.point - transform.position).magnitude;
                     if()*/
@@ -321,6 +373,74 @@ namespace AI
 
             point = transform.position;
             return false;
+        }
+
+
+        private bool IsInCoverPoint()
+        {
+            //TODO: make it more complex
+            float inversePlayerVisibility = aiAgent.GetInversePlayerVisibility();
+            return inversePlayerVisibility < 0.25f;
+        }
+        
+        //TODO: consider moving to AiAgent class
+        private bool TryGetCoverPoint(out Vector3 point)
+        {
+            float axisStep = coverSearchDistance / coverSearchSamples;
+            // get player's head pivot
+            Transform playerHeadPivot = player.GetChild(0);
+
+            List<Vector3> variants = new List<Vector3>();
+            // TODO: use positions delta instead of player forward
+            Vector3 playerForward = playerHeadPivot.forward;
+            playerForward.y = 0;
+            Vector3 playerRight = playerHeadPivot.right;
+            float initialOffset = -0.5f * coverSearchDistance;
+            for (int i = 0; i < coverSearchSamples; i++)
+            {
+                float currentOffset = i * axisStep;
+                Vector3 direction = (playerForward - playerRight * (initialOffset + currentOffset)).normalized;
+                Ray ray = new Ray(playerHeadPivot.position, direction);
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit, coverSearchDistance, coverLayerMask))
+                {
+                    // we (NEED TO) hit a wall
+                    Vector3 possibleCoverPosition = hit.point + direction.normalized * coverMaxThickness;
+                    Ray inversedRay = new Ray(possibleCoverPosition, -direction);
+                    RaycastHit inversedHit;
+                    if (Physics.Raycast(inversedRay, out inversedHit, coverSearchDistance, coverLayerMask))
+                    {
+                        Vector3 delta = hit.point - inversedHit.point;
+                        float thickness = delta.magnitude;
+                        // TODO: add max thickness??
+                        if (thickness > coverMinThickness)
+                        {
+                            variants.Add(possibleCoverPosition);
+                        }
+                    }
+                }
+            }
+
+            if (variants.Count == 0)
+            {
+                point = Vector3.zero;
+                return false;
+            }
+            Vector3 bestCoverPoint = variants[0];
+            float bestCoverPointDistance = coverSearchDistance;
+            foreach (Vector3 coverPoint in variants)
+            {
+                Vector3 delta = coverPoint - transform.position;
+                float distance = delta.sqrMagnitude;
+                if (distance < bestCoverPointDistance)
+                {
+                    bestCoverPoint = coverPoint;
+                    bestCoverPointDistance = distance;
+                }
+            }
+
+            point = bestCoverPoint;
+            return true;
         }
     }
 }

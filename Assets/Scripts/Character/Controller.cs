@@ -119,7 +119,8 @@ namespace Character
                 bool isWalkableGround = Vector3.Angle(groundNormal, Vector3.up) < slideAngle;
                 if (isWalkableGround)
                 {
-                    Acceleration(accelerateDirection, isCrouching ? moveSpeed * 0.25f : moveSpeed);
+                    // Acceleration(accelerateDirection, isCrouching ? moveSpeed * 0.25f : moveSpeed);
+                    Acceleration(accelerateDirection, moveSpeed);
                     velocity = Vector3.ProjectOnPlane(velocity, groundNormal);
 
                     if (isGroundedInPreviousFrame && !inputManager.isJumpPressed)
