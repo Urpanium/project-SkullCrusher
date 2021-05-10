@@ -1,12 +1,19 @@
-﻿using Character;
+﻿using System;
+using Character;
 using Preferences;
 using UnityEngine;
 using UnityEngine.Events;
+using Math = UnityEngine.ProBuilder.Math;
+using Random = UnityEngine.Random;
 
 namespace Weapons
 {
     public class Weapon : MonoBehaviour
     {
+
+
+        public bool isEquipped = false;
+        public bool isEquippedByPlayer = false;
         public Vector3 offset = new Vector3(0.35f, -0.47f, 0.60f);
 
         public Controller controller;
@@ -64,7 +71,7 @@ namespace Weapons
         {
             bulletManager = GameObject.Find(Settings.GameObjects.GlobalController).GetComponent<BulletManager>();
 
-            
+
             currentTimePerShot = timePerShot;
 
             currentClipAmmoAmount = weaponParameters.clipAmmoAmount;
@@ -75,7 +82,7 @@ namespace Weapons
         {
             //TODO: consider removing on release
             timePerShot = 1 / weaponParameters.shootRate;
-            
+
             if (currentTimePerShot > 0)
             {
                 currentTimePerShot -= Time.deltaTime;
@@ -89,20 +96,25 @@ namespace Weapons
                 if (currentReloadTime <= 0)
                     OnReloaded();
             }
+            
+            if (currentClipAmmoAmount == 0 && currentReloadTime <= 0)
+            {
+                StandardReload();
+            }
         }
 
-        public void StandardFire1()
+        public void StandardFire()
         {
             if (!CanFire())
                 return;
-            
+
             // decrease clip ammo amount
             currentClipAmmoAmount--;
             // restart the timer
             currentTimePerShot = timePerShot;
-            
+
             shutter.OnShoot();
-            
+
             fire1Event.Invoke();
 
             Transform bulletTransform = MakeBullet();
@@ -114,23 +126,23 @@ namespace Weapons
             //bullet.maxRicochetAngle = bulletParameters.maxRicochetAngle;
             //TODO: check this
             bulletManager.AddBullet(bullet);
+
+            if (currentClipAmmoAmount == 0)
+            {
+                StandardReload();
+            }
         }
 
         private Transform MakeBullet()
         {
             return Instantiate(bulletPrefab, muzzle.position, muzzle.rotation);
         }
-        
 
-        public void StandardFire2()
-        {
-            //TODO: Remove?
-            // just do nothing 
-        }
 
         public void StandardReload()
         {
-            if (currentReloadTime <= 0)
+            int availableAmmo = GetAvailableRemainedAmmo();
+            if (availableAmmo > 0 && currentReloadTime <= 0)
             {
                 currentReloadTime = weaponParameters.reloadTime;
                 // start reloading animation
@@ -147,6 +159,19 @@ namespace Weapons
         private void OnReloaded()
         {
             onReloadedEvent.Invoke();
+
+            int ammo = GetAvailableRemainedAmmo();
+            if (ammo > 0)
+            {
+                currentClipAmmoAmount = ammo;
+                currentRemainedAmmoAmount -= ammo;
+                OnNewShotReady();
+            }
+        }
+
+        private int GetAvailableRemainedAmmo()
+        {
+            return Mathf.Min(currentRemainedAmmoAmount, weaponParameters.clipAmmoAmount);
         }
 
         public void EjectShell()
@@ -155,7 +180,7 @@ namespace Weapons
             Transform shell = Instantiate(shellPrefab, ejector.position, Random.rotation);
             Rigidbody shellRigidbody = shell.GetComponent<Rigidbody>();
             shellRigidbody.velocity = shellInitialVelocityMultiplier * shellRigidbody.mass * ejector.forward +
-                                      controller.GetVelocity();
+                                      (isEquippedByPlayer ? controller.GetVelocity() : Vector3.zero);
             shellRigidbody.rotation = ejector.rotation;
             shellRigidbody.angularVelocity =
                 Random.onUnitSphere * shellRigidbody.mass * shellInitialAngularVelocityMultiplier;

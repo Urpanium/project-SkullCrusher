@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Preferences;
 using UnityEngine;
 using UnityEngine.AI;
@@ -10,7 +9,7 @@ namespace AI
     [RequireComponent(typeof(NavMeshAgent))]
     public class AiAgent : MonoBehaviour
     {
-        public enum RotationMode
+        private enum RotationMode
         {
             HeadRules = 0,
             BodyRules,
@@ -23,7 +22,6 @@ namespace AI
         public float movementSpeed = 1.0f;
         public float lookSpeed = 1.0f;
         public float bodyRotationSpeed = 2.0f;
-        private RotationMode rotationMode;
 
         public float agentHeight = 2.0f;
         public float sampleRadius = 15.0f;
@@ -77,55 +75,28 @@ namespace AI
             if (IsArrivedAtTargetPosition())
             {
                 onArrivedAtTargetPosition.Invoke();
-                rotationMode = RotationMode.BodyRules;
             }
         }
 
 
         private void LookUpdate()
         {
-            switch (rotationMode)
+            // head always rules
+            float neckDelta = GetNeckDelta();
+            Vector3 targetLookDirection = targetLookPosition - headTransform.position;
+            //Vector3 targetLookDirection = headTransform.forward;
+            if (neckDelta > maxNeckAngleDelta)
             {
-                case RotationMode.HeadRules:
-                {
-                    float neckDelta = GetNeckDelta();
-                    Vector3 targetLookDirection = targetLookPosition - headTransform.position;
-                    //Vector3 targetLookDirection = headTransform.forward;
-                    if (neckDelta > maxNeckAngleDelta)
-                    {
-                        // neck is about to break
-                        // need to rotate body
-                        Vector3 horizontalTargetLookDirection = targetLookDirection;
-                        horizontalTargetLookDirection.y = 0;
-                        bodyTransform.rotation = Quaternion.Lerp(bodyTransform.rotation,
-                            Quaternion.LookRotation(horizontalTargetLookDirection), bodyRotationSpeed * Time.deltaTime);
-                    }
-
-                    headTransform.forward =
-                        Vector3.Lerp(headTransform.forward, targetLookDirection, lookSpeed * Time.deltaTime);
-                    break;
-                }
-                case RotationMode.BodyRules:
-                {
-                    Vector3 movingDirection = GetMovingDirection();
-
-                    float neckDelta = GetNeckDelta();
-
-                    if (neckDelta > maxNeckAngleDelta)
-                    {
-                        headTransform.rotation = Quaternion.Lerp(headTransform.rotation,
-                            Quaternion.LookRotation(movingDirection), lookSpeed * Time.deltaTime);
-                    }
-
-                    Vector3 horizontalTargetLookDirection = movingDirection;
-                    horizontalTargetLookDirection.y = 0;
-                    if (movingDirection.sqrMagnitude > 0)
-                        bodyTransform.rotation = Quaternion.Lerp(bodyTransform.rotation,
-                            Quaternion.LookRotation(horizontalTargetLookDirection), bodyRotationSpeed * Time.deltaTime);
-
-                    break;
-                }
+                // neck is about to break
+                // need to rotate body
+                Vector3 horizontalTargetLookDirection = targetLookDirection;
+                horizontalTargetLookDirection.y = 0;
+                bodyTransform.rotation = Quaternion.Lerp(bodyTransform.rotation,
+                    Quaternion.LookRotation(horizontalTargetLookDirection), bodyRotationSpeed * Time.deltaTime);
             }
+
+            headTransform.forward =
+                Vector3.Lerp(headTransform.forward, targetLookDirection, lookSpeed * Time.deltaTime);
         }
 
         private float GetNeckDelta()
@@ -154,7 +125,7 @@ namespace AI
             //targetMovePosition = transform.position;
             GoTo(transform.position);
         }
-        
+
 
         public Vector3 GetMovingDirection()
         {
@@ -164,7 +135,7 @@ namespace AI
         // returns possibility to move right into point
         public bool GoTo(Vector3 position)
         {
-            rotationMode = RotationMode.BodyRules;
+            //rotationMode = RotationMode.BodyRules;
             NavMeshHit hit;
             if (NavMesh.SamplePosition(position, out hit, sampleRadius, -1))
             {
@@ -185,14 +156,13 @@ namespace AI
 
         public void LookAt(Vector3 position)
         {
-            rotationMode = RotationMode.HeadRules;
+            //rotationMode = RotationMode.HeadRules;
             targetLookPosition = position;
         }
 
         public void LookAtDirection(Vector3 direction)
         {
-            // remove if useless
-            rotationMode = RotationMode.HeadRules;
+            //rotationMode = RotationMode.HeadRules;
             targetLookPosition = headTransform.position + direction;
         }
 

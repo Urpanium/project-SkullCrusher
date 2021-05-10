@@ -99,16 +99,5 @@ namespace Weapons
         {
             bullets.Add(bullet);
         }
-
-        private void OnDrawGizmosSelected()
-        {
-            Gizmos.color = Color.red;
-            foreach (var t in bullets)
-            {
-                Gizmos.DrawSphere(t.transform.position, t.parameters.radius);
-                Gizmos.DrawLine(t.transform.position,
-                    t.transform.position + t.transform.forward * (Time.deltaTime * t.parameters.speed));
-            }
-        }
     }
 }

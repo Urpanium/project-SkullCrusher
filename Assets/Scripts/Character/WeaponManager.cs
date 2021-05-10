@@ -51,6 +51,8 @@ namespace Character
 
             currentWeaponTransform = weaponTransform;
             currentWeapon = weaponTransform.GetComponent<Weapon>();
+            currentWeapon.isEquipped = true;
+            currentWeapon.isEquippedByPlayer = true;
             currentWeaponBoxCollider = weaponTransform.GetComponent<BoxCollider>();
             currentWeaponRigidbody = weaponTransform.GetComponent<Rigidbody>();
 
@@ -61,18 +63,11 @@ namespace Character
 
         public void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.layer == LayerMask.NameToLayer(Settings.Tags.Weapon))
+            if (other.gameObject.layer == LayerMask.NameToLayer(Settings.Tags.Weapon) && !other.transform.GetComponent<Weapon>().isEquipped)
             {
                 PickupWeapon(other.transform);
             }
         }
 
-        /*public void OnCollisionEnter(Collision collision)
-        {
-            if (collision.collider.gameObject.layer == LayerMask.NameToLayer(Settings.Tags.Weapon))
-            {
-                PickupWeapon(collision.collider.transform.root);
-            }
-        }*/
     }
 }
