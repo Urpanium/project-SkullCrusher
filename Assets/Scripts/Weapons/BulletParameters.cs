@@ -10,7 +10,6 @@ namespace Weapons
         public float radius = 0.02f;
         [Range(0, 1)] public float initialRicochetChance = 0.75f;
         [Range(0, 90)] public float maxRicochetAngle = 45.0f;
-        public LayerMask shootableMask;
         public int defaultDamage;
         public int headDamage;
         public int armDamage;

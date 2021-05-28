@@ -179,10 +179,16 @@ namespace AI
                 }
             }
 
-            Vector3 playerDelta = playerTransform.position - transform.position;
-            float distanceMultiplier = (visionDistance - playerDelta.magnitude) / visionDistance;
+            
+            
 
-            return result * distanceMultiplier;
+            return result;
+        }
+
+        public float GetPlayerVisibilityDistanceMultiplier()
+        {
+            Vector3 playerDelta = playerTransform.position - transform.position;
+            return (visionDistance - playerDelta.magnitude) / visionDistance;
         }
 
         // how good player can see agent

@@ -379,6 +379,21 @@ namespace Character
             return velocity;
         }
 
+        public Vector3 GetLookPoint(LayerMask mask, float distance)
+        {
+            Ray ray = new Ray(cameraTransform.position, cameraTransform.forward);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, distance, mask))
+            {
+                Vector3 point = hit.point;
+                return point;
+            }
+
+            return cameraTransform.position + cameraTransform.forward * distance;
+        }
+        
+
+
         private void OnDrawGizmos()
         {
             if (!collider)

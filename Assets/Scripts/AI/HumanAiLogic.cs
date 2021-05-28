@@ -1,18 +1,17 @@
 using System.Collections.Generic;
+using System.Numerics;
 using Character;
 using Preferences;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.ProBuilder;
 using Weapons;
+using Quaternion = UnityEngine.Quaternion;
 using Random = UnityEngine.Random;
 using Vector3 = UnityEngine.Vector3;
 
-////////////////////////////////////////////////////
-// OLD
-////////////////////////////////////////////////////
 namespace AI
 {
+    [RequireComponent(typeof(DamageableObject))]
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(AiAgent))]
     public class HumanAiLogic : MonoBehaviour
@@ -22,6 +21,7 @@ namespace AI
             Idle = 0, // patrols or stands still
             Contact, // player is visible, waiting for spot time to end up (if player is far enough), maybe playing some noises to notify player
             Attacking, // player is spotted, bot's position is convenient to shoot, if not, try to walk to player or distance from him
+
             // RetreatingAttacking, // attacking state, but player it too close, trying to avoid him
             TakingCover, // fires out what remains in weapon's clip while going to nearest cover
             Chasing, // player is not visible, trying to establish contact before time is up, try to walk to player's last position 
@@ -75,11 +75,12 @@ namespace AI
         [Range(0.01f, 1.99f)] public float coverMinThickness = 0.25f;
         [Range(0.02f, 2.0f)] public float coverMaxThickness = 2.0f;
 
-        [Tooltip("How close player must be to start retreating. Set to negative for weapon standard.")]
-        // TODO: implement negative variant
+        [Tooltip("How close player must be to start retreating.")]
         public float retreatDistance = 5.0f;
 
         [Range(1, 15)] public int retreatSearchSamples = 10;
+        public float recoveredContactMoveDelay = 0.3f;
+
         public LayerMask coverLayerMask;
 
         public Transform armPivot;
@@ -93,6 +94,8 @@ namespace AI
         private float currentSearchIntervalTime;
         private float currentSearchTime;
 
+        private float currentRecoveredContactMoveDelayTime;
+
         private Vector3 initialPosition;
 
         // chasing player when it's gone
@@ -102,6 +105,7 @@ namespace AI
         private AiPatrolPointSet pointSet;
 
         //private NavMeshAgent navMeshAgent;
+        private BulletManager bulletManager;
         private AiAgent aiAgent;
         private Transform player;
         private Controller controller;
@@ -111,8 +115,9 @@ namespace AI
             Random.InitState(0);
 
             aiAgent = GetComponent<AiAgent>();
-            
+
             player = GameObject.FindGameObjectWithTag(Settings.Tags.Player).transform;
+            bulletManager = GameObject.Find(Settings.GameObjects.GlobalController).GetComponent<BulletManager>();
             controller = player.GetComponent<Controller>();
             if (idleType == IdleType.Patrol)
                 pointSet = GetComponent<AiPatrolPointSet>();
@@ -123,6 +128,8 @@ namespace AI
 
         public void EquipWeapon(Weapon weapon)
         {
+            if (!weapon)
+                return;
             DropEquippedWeapon();
             Transform weaponTransform = weapon.transform;
             equippedWeapon = weapon;
@@ -140,6 +147,8 @@ namespace AI
 
         private void Update()
         {
+            UpdateEquippedWeapon();
+
 
             switch (state)
             {
@@ -183,6 +192,22 @@ namespace AI
             }
         }
 
+        private void UpdateEquippedWeapon()
+        {
+            if (!equippedWeapon)
+                return;
+            Ray ray = new Ray(aiAgent.headTransform.position, aiAgent.headTransform.forward);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, aiAgent.visionDistance, aiAgent.visibleObjectsMask))
+            {
+                Vector3 point = hit.point;
+                //equippedWeapon.transform.rotation = 
+                equippedWeapon.transform.rotation = Quaternion.Lerp(equippedWeapon.transform.rotation,
+                    Quaternion.LookRotation(point - transform.position),
+                    aiAgent.lookSpeed * Time.deltaTime);
+            }
+        }
+
 
         private void IdleStateUpdate()
         {
@@ -198,6 +223,7 @@ namespace AI
                 case IdleType.Patrol:
                 {
                     // return to patrol positions
+                    // TODO: implement
                     break;
                 }
             }
@@ -237,14 +263,16 @@ namespace AI
                     aiAgent.GoTo(retreatPoint);
                 }
             }
+
             if (distance > aiAgent.visionDistance * 0.5f)
             {
                 aiAgent.GoTo(Vector3.Lerp(player.position, transform.position, 0.5f));
             }
 
             // TODO: shoot this motherfucker
-
-            equippedWeapon.StandardFire();
+            if (equippedWeapon && IsWeaponPointingAtPlayer())
+                // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
+                equippedWeapon.StandardFire();
         }
 
         private void AttackingStateTransitionCheck()
@@ -254,15 +282,18 @@ namespace AI
             {
                 state = State.Chasing;
             }
-            
-            if (equippedWeapon.currentClipAmmoAmount == 0)
-            {
-                if (equippedWeapon.currentRemainedAmmoAmount < equippedWeapon.weaponParameters.clipAmmoAmount)
-                {
-                    equippedWeapon.currentRemainedAmmoAmount += equippedWeapon.weaponParameters.clipAmmoAmount;
-                }
 
-                state = State.TakingCover;
+            if (equippedWeapon)
+            {
+                if (equippedWeapon.currentClipAmmoAmount == 0)
+                {
+                    if (equippedWeapon.currentRemainedAmmoAmount < equippedWeapon.weaponParameters.clipAmmoAmount)
+                    {
+                        equippedWeapon.currentRemainedAmmoAmount += equippedWeapon.weaponParameters.clipAmmoAmount;
+                    }
+
+                    state = State.TakingCover;
+                }
             }
         }
 
@@ -277,12 +308,9 @@ namespace AI
                     return;
                 }
 
-                print("Can't find cover point");
-
                 if (aiAgent.IsArrivedAtTargetPosition() && TryGetRandomPointToSearch(out pointToGo))
                 {
                     aiAgent.GoTo(pointToGo);
-                    return;
                 }
             }
 
@@ -291,9 +319,12 @@ namespace AI
 
         private void TakingCoverStateTransitionCheck()
         {
-            if (equippedWeapon.currentClipAmmoAmount > 0)
+            if (equippedWeapon)
             {
-                state = State.Attacking;
+                if (equippedWeapon.currentClipAmmoAmount > 0)
+                {
+                    state = State.Attacking;
+                }
             }
         }
 
@@ -328,16 +359,21 @@ namespace AI
             // we know that player is here so we paying more attention
             if (aiAgent.GetPlayerVisibility() > contactStartVisibility)
             {
-                aiAgent.StopMoving();
-                currentChaseTime = 0.0f;
-                state = State.Attacking;
+                currentRecoveredContactMoveDelayTime += Time.deltaTime;
+                if (currentRecoveredContactMoveDelayTime > recoveredContactMoveDelay)
+                {
+                    currentRecoveredContactMoveDelayTime = 0.0f;
+                    //aiAgent.StopMoving();
+                    currentChaseTime = 0.0f;
+                    state = State.Attacking;
+                }
             }
         }
 
         private void ContactStateUpdate()
         {
             aiAgent.LookAt(player.position);
-            currentContactTime += Time.deltaTime;
+            currentContactTime += Time.deltaTime * aiAgent.GetPlayerVisibilityDistanceMultiplier();
         }
 
         private void ContactStateTransitionCheck()
@@ -438,7 +474,7 @@ namespace AI
             Vector3 playerDeltaRight = Vector3.Cross(playerDelta.normalized, Vector3.up);
             float retreatAtDistance = retreatDistance - playerDelta.magnitude;
             float axisStep = Mathf.Deg2Rad * 180.0f / retreatSearchSamples;
-            
+
             // first of all try playerDelta direction
             Ray ray1 = new Ray(transform.position + Vector3.up * (aiAgent.agentHeight * 0.5f), playerDelta);
             Ray ray2 = new Ray(transform.position - Vector3.up * (aiAgent.agentHeight * 0.499f), playerDelta);
@@ -449,6 +485,7 @@ namespace AI
                 point = transform.position + playerDelta.normalized * retreatAtDistance;
                 return true;
             }
+
             playerDelta.Normalize();
             for (int i = 0; i < retreatSearchSamples; i++)
             {
@@ -468,6 +505,19 @@ namespace AI
             }
 
             point = Vector3.zero;
+            return false;
+        }
+
+        private bool IsWeaponPointingAtPlayer()
+        {
+            Ray ray = new Ray(equippedWeapon.transform.position, equippedWeapon.muzzle.forward);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, 3000.0f, bulletManager.shootableMask))
+            {
+                if (hit.transform.root.CompareTag(Settings.Tags.Player))
+                    return true;
+            }
+
             return false;
         }
 
@@ -545,9 +595,9 @@ namespace AI
 
         private void OnDrawGizmos()
         {
-            if(!player)
+            if (!player)
                 return;
-            
+
             Vector3 playerDelta = transform.position - player.position;
             playerDelta.y = 0;
             // just swap x and z

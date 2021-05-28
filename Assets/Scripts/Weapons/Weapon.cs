@@ -59,6 +59,7 @@ namespace Weapons
          */
 
         private BulletManager bulletManager;
+        private WeaponManager weaponManager;
 
         private float timePerShot;
 
@@ -69,8 +70,11 @@ namespace Weapons
 
         private void Start()
         {
-            bulletManager = GameObject.Find(Settings.GameObjects.GlobalController).GetComponent<BulletManager>();
-
+            GameObject globalController = GameObject.Find(Settings.GameObjects.GlobalController);
+            bulletManager = globalController.GetComponent<BulletManager>();
+            
+            controller = GameObject.FindGameObjectWithTag(Settings.Tags.Player).GetComponent<Controller>();
+            weaponManager = controller.GetComponent<WeaponManager>();
 
             currentTimePerShot = timePerShot;
 
@@ -118,12 +122,16 @@ namespace Weapons
             fire1Event.Invoke();
 
             Transform bulletTransform = MakeBullet();
+            if (isEquippedByPlayer)
+            {
+                bulletTransform.forward = controller.GetLookPoint(bulletManager.shootableMask, weaponManager.weaponCheckDistance) - muzzle.position;
+            }
+            
             Bullet bullet = bulletTransform.gameObject.AddComponent<Bullet>();
             bullet.parameters = bulletParameters;
             bullet.seed = currentClipAmmoAmount;
             bullet.ricochetChance = bulletParameters.initialRicochetChance;
-            //bullet.ricochetChance = bulletParameters.initialRicochetChance;
-            //bullet.maxRicochetAngle = bulletParameters.maxRicochetAngle;
+            
             //TODO: check this
             bulletManager.AddBullet(bullet);
 
@@ -141,7 +149,7 @@ namespace Weapons
 
         public void StandardReload()
         {
-            int availableAmmo = GetAvailableRemainedAmmo();
+            int availableAmmo = GetAvailableForReloadAmmo();
             if (availableAmmo > 0 && currentReloadTime <= 0)
             {
                 currentReloadTime = weaponParameters.reloadTime;
@@ -159,8 +167,7 @@ namespace Weapons
         private void OnReloaded()
         {
             onReloadedEvent.Invoke();
-
-            int ammo = GetAvailableRemainedAmmo();
+            int ammo = GetAvailableForReloadAmmo();
             if (ammo > 0)
             {
                 currentClipAmmoAmount = ammo;
@@ -169,19 +176,21 @@ namespace Weapons
             }
         }
 
-        private int GetAvailableRemainedAmmo()
+        private int GetAvailableForReloadAmmo()
         {
-            return Mathf.Min(currentRemainedAmmoAmount, weaponParameters.clipAmmoAmount);
+            int remainedAmmo = currentClipAmmoAmount;
+            int need = weaponParameters.clipAmmoAmount - currentClipAmmoAmount;
+            int available = Mathf.Min(currentRemainedAmmoAmount, weaponParameters.clipAmmoAmount);
+            return Mathf.Min(available, need);
         }
 
         public void EjectShell()
         {
             // shell spawn and ejection
-            Transform shell = Instantiate(shellPrefab, ejector.position, Random.rotation);
+            Transform shell = Instantiate(shellPrefab, ejector.position, Quaternion.LookRotation(ejector.right, ejector.up));
             Rigidbody shellRigidbody = shell.GetComponent<Rigidbody>();
             shellRigidbody.velocity = shellInitialVelocityMultiplier * shellRigidbody.mass * ejector.forward +
                                       (isEquippedByPlayer ? controller.GetVelocity() : Vector3.zero);
-            shellRigidbody.rotation = ejector.rotation;
             shellRigidbody.angularVelocity =
                 Random.onUnitSphere * shellRigidbody.mass * shellInitialAngularVelocityMultiplier;
         }

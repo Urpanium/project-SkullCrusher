@@ -25,7 +25,7 @@ namespace Character
             float delta = Time.deltaTime * zoomSpeed;
 
             // TODO: use input system
-            if (Input.GetKey(KeyCode.C))
+            if (Input.GetKey(KeyCode.Mouse1))
                 delta *= zoomFieldOfView - currentFieldOfView;
             else
                 delta *= initialFieldOfView - currentFieldOfView;

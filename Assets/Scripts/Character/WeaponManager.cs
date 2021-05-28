@@ -10,10 +10,11 @@ namespace Character
     {
         
         public Transform cameraTransform;
-
-
+        public float rotationSpeed = 30.0f;
+        public float weaponCheckDistance = 3000.0f;
+            
         private InputManagerOld inputManager;
-
+        private BulletManager bulletManager;
         private List<Weapon> weapons;
         
         private Weapon currentWeapon;
@@ -24,17 +25,14 @@ namespace Character
 
         private void Start()
         {
-            inputManager = GameObject.Find(Settings.GameObjects.GlobalController).GetComponent<InputManagerOld>();
+            GameObject globalController = GameObject.Find(Settings.GameObjects.GlobalController);
+            inputManager = globalController.GetComponent<InputManagerOld>();
+            bulletManager = globalController.GetComponent<BulletManager>();
         }
 
         private void Update()
         {
-            if (currentWeaponTransform)
-            {
-                // TODO: remove?
-                currentWeaponTransform.rotation = cameraTransform.rotation;
-            }
-
+            
             if (inputManager.isFire1Pressed)
             {
                 if (currentWeapon)
@@ -48,7 +46,7 @@ namespace Character
         private void PickupWeapon(Transform weaponTransform)
         {
             weaponTransform.parent = cameraTransform;
-
+            weaponTransform.forward = cameraTransform.forward;
             currentWeaponTransform = weaponTransform;
             currentWeapon = weaponTransform.GetComponent<Weapon>();
             currentWeapon.isEquipped = true;
@@ -59,6 +57,11 @@ namespace Character
             currentWeaponRigidbody.isKinematic = true;
             
             weaponTransform.localPosition = currentWeapon.offset;
+        }
+
+        public Weapon GetCurrentWeapon()
+        {
+            return currentWeapon;
         }
 
         public void OnTriggerEnter(Collider other)

@@ -26,7 +26,11 @@ namespace Weapons
             for (int i = 0; i < bullets.Count; i++)
             {
                 bool destroyed = UpdateBullet(bullets[i]);
-                if (destroyed) i--;
+                if (destroyed)
+                {
+                    bullets.RemoveAt(i);
+                    i--;
+                }
             }
         }
 
@@ -62,15 +66,15 @@ namespace Weapons
                 // if we hit something that can ricochet our bullet
                 // and angle fits
                 // TODO: also add hitting enemy / player case
-                if (hit.transform.tag.Equals(Settings.Tags.Ricochetable))
+                string hitObjectTag = hit.transform.tag;
+                if (hitObjectTag.Equals(Settings.Tags.Ricochetable))
                 {
                     Random.InitState(bullet.seed);
 
                     float chance = bullet.ricochetChance *
                                    ((bullet.parameters.maxRicochetAngle - angle) /
-                                       bullet.parameters.maxRicochetAngle);
+                                    bullet.parameters.maxRicochetAngle);
                     // try ricochet
-                    //print("chance: " + chance);
                     if (Random.value < chance &&
                         angle <= bullet.parameters.maxRicochetAngle)
                     {
@@ -80,7 +84,20 @@ namespace Weapons
                         return false;
                     }
                 }
-                
+                else
+                {
+                    // we hit something (body)
+                    // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
+                    DamageableObject damageableObject = hit.transform.root.GetComponent<DamageableObject>();
+                    if (damageableObject)
+                    {
+                        damageableObject.TakeDamage(hit.collider, bullet.parameters);
+                    }
+
+                    //TODO: show some particles and destroy bullet
+                    Destroy(bullet.gameObject);
+                    return true;
+                }
             }
             else
             {
@@ -89,9 +106,8 @@ namespace Weapons
                 return false;
             }
 
-            //TODO: show some particles and destroy bullet
-            Destroy(bullet.gameObject);
-            return true;
+
+            return false;
         }
 
 
