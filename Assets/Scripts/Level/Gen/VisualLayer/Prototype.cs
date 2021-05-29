@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using WaveFunctionCollapse3D.PathLayer;
-using WaveFunctionCollapse3D.Sockets;
-using WaveFunctionCollapse3D.Util;
+using Level.Gen.Util;
 using WaveFunctionCollapse3D.VisualLayer.Sockets;
 
-namespace WaveFunctionCollapse3D.VisualLayer
+namespace Level.Gen.VisualLayer
 {
+    [Serializable]
     public class Prototype
     {
         public string Name { get; }
@@ -37,7 +36,7 @@ namespace WaveFunctionCollapse3D.VisualLayer
         }
 
         public List<Dector3> SocketsPositions { get; }
-        private string[] Sockets { get; }
+        private List<string> Sockets { get; }
 
         /* with rotation = 0
          * 0 Top
@@ -66,16 +65,16 @@ namespace WaveFunctionCollapse3D.VisualLayer
          * top and bottom sockets: 7_3 - where 3 is rotation (0, 1, 2, 3 => 0, 90, 180, 270 degrees)
          */
 
-        public Prototype(string name, string[] sockets, Dector3 size, List<Dector3> socketsPositions)
+        public Prototype(string name, List<string> sockets, List<Dector3> socketsPositions, Dector3 size)
         {
             Name = name;
             Sockets = sockets;
             Size = size;
             SocketsPositions = socketsPositions;
 
-            if (sockets.Length > GetSurfaceSquare())
+            if (sockets.Count > GetSurfaceSquare())
             {
-                throw new Exception($"Incorrect number of sockets: {sockets.Length}");
+                throw new Exception($"Incorrect number of sockets: {sockets.Count}");
             }
         }
 
@@ -96,13 +95,6 @@ namespace WaveFunctionCollapse3D.VisualLayer
             return Sockets[index];
         }
 
-        private int GetSurfaceSquare()
-        {
-            int xFaces = Size.Z * Size.Y * 2;
-            int yFaces = Size.X * Size.Z * 2;
-            int zFaces = Size.Y * Size.X * 2;
-
-            return xFaces + yFaces + zFaces;
-        }
+        
     }
 }

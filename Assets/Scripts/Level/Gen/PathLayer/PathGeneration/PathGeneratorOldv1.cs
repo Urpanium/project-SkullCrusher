@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using WaveFunctionCollapse3D.Util;
-using WaveFunctionCollapse3D.VisualLayer;
-using WaveFunctionCollapse3D.WaveFunction;
+using Level.Gen.Util;
+using Level.Gen.VisualLayer;
+using WaveFunctionCollapse3D.PathLayer.PathGeneration;
 
-namespace WaveFunctionCollapse3D.PathLayer.PathGeneration
+namespace Level.Gen.PathLayer.PathGeneration
 {
     /*
      * so this old version of path generator
@@ -39,14 +39,14 @@ namespace WaveFunctionCollapse3D.PathLayer.PathGeneration
 
         public PathGeneratorOld()
         {
-            _random = new Random(Config.Seed);
+            _random = new Random(Config.seed);
         }
 
 
         public PathGeneratorOld(PathGeneratorConfig config)
         {
             Config = config;
-            _random = new Random(Config.Seed);
+            _random = new Random(Config.seed);
         }
 
         public void Generate()
@@ -58,9 +58,9 @@ namespace WaveFunctionCollapse3D.PathLayer.PathGeneration
             {
                 Position =
                 {
-                    X = 0,
-                    Y = 0,
-                    Z = 0,
+                    x = 0,
+                    y = 0,
+                    z = 0,
                 },
                 Type = PathNodeType.Start
             };
@@ -96,13 +96,13 @@ namespace WaveFunctionCollapse3D.PathLayer.PathGeneration
              * -2 for start and end nodes
              */
             int maxLengthPerCorridor =
-                (int) Math.Floor((float) (Config.MaximumPathLength - 2) / requiredPrototypesCount);
+                (int) Math.Floor((float) (Config.maximumPathLength - 2) / requiredPrototypesCount);
 
             /*
              * -2 for start and end nodes
              */
             int minLengthPerCorridor =
-                (int) Math.Floor((float) (Config.MinimumPathLength - 2) / requiredPrototypesCount);
+                (int) Math.Floor((float) (Config.minimumPathLength - 2) / requiredPrototypesCount);
 
 
             throw new NotImplementedException();
@@ -125,9 +125,9 @@ namespace WaveFunctionCollapse3D.PathLayer.PathGeneration
             if (size == null)
             {
                 //Dector3 freeSpace = IsSpaceFree();
-                int width = _random.Next(Config.MinimumRoomXSize, Config.MaximumRoomXSize);
-                int height = _random.Next(Config.MinimumRoomYSize, Config.MaximumRoomYSize);
-                int length = _random.Next(Config.MinimumRoomZSize, Config.MaximumRoomZSize);
+                int width = _random.Next(Config.minimumRoomXSize, Config.maximumRoomXSize);
+                int height = _random.Next(Config.minimumRoomYSize, Config.maximumRoomYSize);
+                int length = _random.Next(Config.minimumRoomZSize, Config.maximumRoomZSize);
 
                 size = new Dector3(width, height, length);
             }
@@ -147,24 +147,24 @@ namespace WaveFunctionCollapse3D.PathLayer.PathGeneration
 
             foreach (Dector3 entry in entries)
             {
-                if (entry.X < minBound.X)
-                    minBound.X = entry.X;
+                if (entry.x < minBound.x)
+                    minBound.x = entry.x;
 
-                if (entry.Y < minBound.Y)
-                    minBound.Y = entry.Y;
+                if (entry.y < minBound.y)
+                    minBound.y = entry.y;
 
-                if (entry.Z < minBound.Z)
-                    minBound.Z = entry.Z;
+                if (entry.z < minBound.z)
+                    minBound.z = entry.z;
 
 
-                if (entry.X > maxBound.X)
-                    maxBound.X = entry.X;
+                if (entry.x > maxBound.x)
+                    maxBound.x = entry.x;
 
-                if (entry.Y > maxBound.Y)
-                    maxBound.Y = entry.Y;
+                if (entry.y > maxBound.y)
+                    maxBound.y = entry.y;
 
-                if (entry.Z > maxBound.Z)
-                    maxBound.Z = entry.Z;
+                if (entry.z > maxBound.z)
+                    maxBound.z = entry.z;
             }
 
             bool entriesOnBorder = IsEntriesOnBorderOfCuboid(entries, minBound, maxBound);
@@ -186,12 +186,12 @@ namespace WaveFunctionCollapse3D.PathLayer.PathGeneration
             foreach (Dector3 entry in entries)
             {
                 if (
-                    entry.X == point1.X
-                    || entry.Y == point1.Y
-                    || entry.Z == point1.Z
-                    || entry.X == point2.X
-                    || entry.Y == point2.Y
-                    || entry.Z == point2.Z
+                    entry.x == point1.x
+                    || entry.y == point1.y
+                    || entry.z == point1.z
+                    || entry.x == point2.x
+                    || entry.y == point2.y
+                    || entry.z == point2.z
                 )
                 {
                     return true;
@@ -209,11 +209,11 @@ namespace WaveFunctionCollapse3D.PathLayer.PathGeneration
 
         private void PlaceRoom(Dector3 where, Dector3 size, List<Dector3> entriesLocalPositions)
         {
-            for (int x = 0; x < size.X; x++)
+            for (int x = 0; x < size.x; x++)
             {
-                for (int y = 0; y < size.Y; y++)
+                for (int y = 0; y < size.y; y++)
                 {
-                    for (int z = 0; z < size.Z; z++)
+                    for (int z = 0; z < size.z; z++)
                     {
                         Dector3 offset = new Dector3(x, y, z);
                         PathNode roomNode = new PathNode(where + offset);
@@ -225,7 +225,7 @@ namespace WaveFunctionCollapse3D.PathLayer.PathGeneration
                                 roomNode.CanGoToLeft = false;
                             }
 
-                            if (x == size.X - 1)
+                            if (x == size.x - 1)
                             {
                                 roomNode.CanGoToRight = false;
                             }
@@ -235,7 +235,7 @@ namespace WaveFunctionCollapse3D.PathLayer.PathGeneration
                                 roomNode.CanGoToBottom = false;
                             }
 
-                            if (y == size.Y - 1)
+                            if (y == size.y - 1)
                             {
                                 roomNode.CanGoToTop = false;
                             }
@@ -245,7 +245,7 @@ namespace WaveFunctionCollapse3D.PathLayer.PathGeneration
                                 roomNode.CanGoToBack = false;
                             }
 
-                            if (z == size.Z - 1)
+                            if (z == size.z - 1)
                             {
                                 roomNode.CanGoToForward = false;
                             }
@@ -259,22 +259,22 @@ namespace WaveFunctionCollapse3D.PathLayer.PathGeneration
 
         private bool CanFitRoom(Dector3 where, Dector3 size)
         {
-            int x1 = where.X;
-            int x2 = where.X + size.X;
+            int x1 = where.x;
+            int x2 = where.x + size.x;
 
-            int y1 = where.Y;
-            int y2 = where.Y + size.Y;
+            int y1 = where.y;
+            int y2 = where.y + size.y;
 
-            int z1 = where.Z;
-            int z2 = where.Z + size.Z;
+            int z1 = where.z;
+            int z2 = where.z + size.z;
 
             foreach (var node in Nodes)
             {
                 Dector3 p = node.Position;
                 if (
-                    p.X > x1 && p.X < x2 ||
-                    p.Y > y1 && p.Y < y2 ||
-                    p.Z > z1 && p.Z < z2
+                    p.x > x1 && p.x < x2 ||
+                    p.y > y1 && p.y < y2 ||
+                    p.z > z1 && p.z < z2
                 )
                     return false;
             }
@@ -334,22 +334,22 @@ namespace WaveFunctionCollapse3D.PathLayer.PathGeneration
 
         private bool CanFitCuboid(Dector3 point1, Dector3 point2)
         {
-            int fromX = Math.Min(point1.X, point2.X);
-            int toX = Math.Max(point1.X, point2.X);
+            int fromX = Math.Min(point1.x, point2.x);
+            int toX = Math.Max(point1.x, point2.x);
 
-            int fromY = Math.Min(point1.Y, point2.Y);
-            int toY = Math.Max(point1.Y, point2.Y);
+            int fromY = Math.Min(point1.y, point2.y);
+            int toY = Math.Max(point1.y, point2.y);
 
-            int fromZ = Math.Min(point1.Z, point2.Z);
-            int toZ = Math.Max(point1.Z, point2.Z);
+            int fromZ = Math.Min(point1.z, point2.z);
+            int toZ = Math.Max(point1.z, point2.z);
 
             foreach (var node in Nodes)
             {
                 Dector3 d = node.Position;
                 if (
-                    (d.X > toX && d.X < fromX) ||
-                    (d.Y > toY && d.Y < fromY) ||
-                    (d.Z > toZ && d.Z < fromZ)
+                    (d.x > toX && d.x < fromX) ||
+                    (d.y > toY && d.y < fromY) ||
+                    (d.z > toZ && d.z < fromZ)
                 )
                 {
                     return false;
@@ -423,7 +423,7 @@ namespace WaveFunctionCollapse3D.PathLayer.PathGeneration
         {
             Dector3 directionNonNormalized = Dector3.MultiplyCorrespondingAxis(currentSize, direction);
             Dector3 box = currentSize - directionNonNormalized + direction;
-            Dector3 halfExtend = new Dector3((box.X - 1) / 2, (box.Y - 1) / 2, (box.Z - 1) / 2);
+            Dector3 halfExtend = new Dector3((box.x - 1) / 2, (box.y - 1) / 2, (box.z - 1) / 2);
             Dector3 from = entry - halfExtend;
             Dector3 to = entry + halfExtend;
             return CanFitCuboid(from, to);
@@ -431,11 +431,11 @@ namespace WaveFunctionCollapse3D.PathLayer.PathGeneration
 
         private void Reset()
         {
-            _random = new Random(Config.Seed);
+            _random = new Random(Config.seed);
             Nodes.Clear();
             _currentPathLength = 0;
-            _currentCanSpawnOffset = Config.MinimumOffsetBetweenMustSpawnPrototypes;
-            _currentMustSpawnOffset = Config.MinimumOffsetBetweenCanSpawnPrototypes;
+            _currentCanSpawnOffset = Config.minimumOffsetBetweenMustSpawnPrototypes;
+            _currentMustSpawnOffset = Config.minimumOffsetBetweenCanSpawnPrototypes;
         }
     }
 }

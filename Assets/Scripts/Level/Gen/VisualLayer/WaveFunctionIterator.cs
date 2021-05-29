@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Level.Gen.VisualLayer;
 using WaveFunctionCollapse3D.PathLayer.Tiles;
 
 namespace WaveFunctionCollapse3D.VisualLayer

@@ -1,13 +1,15 @@
 ﻿using System;
+using UnityEngine;
 
-namespace WaveFunctionCollapse3D.Util
+namespace Level.Gen.Util
 {
+    [Serializable]
     public class Dector3
     {
         // Discrete Vector3
-        public int X { get; set; }
-        public int Y { get; set; }
-        public int Z { get; set; }
+        public int x;
+        public int y;
+        public int z;
 
 
         public const int UpIndex = 0;
@@ -43,25 +45,25 @@ namespace WaveFunctionCollapse3D.Util
 
         public Dector3(int x, int y, int z)
         {
-            X = x;
-            Y = y;
-            Z = z;
+            this.x = x;
+            this.y = y;
+            this.z = z;
         }
 
         public static bool IsDifferentOnlyByOneAxis(Dector3 d1, Dector3 d2)
         {
             int differences = 0;
-            if (d1.X != d2.X)
+            if (d1.x != d2.x)
             {
                 differences++;
             }
 
-            if (d1.Y != d2.Y)
+            if (d1.y != d2.y)
             {
                 differences++;
             }
 
-            if (d1.Z != d2.Z)
+            if (d1.z != d2.z)
             {
                 differences++;
             }
@@ -71,14 +73,14 @@ namespace WaveFunctionCollapse3D.Util
 
         public static (Dector3, Dector3) ToMinAndMax(Dector3 point1, Dector3 point2)
         {
-            int fromX = Math.Min(point1.X, point2.X);
-            int toX = Math.Max(point1.X, point2.X);
+            int fromX = Math.Min(point1.x, point2.x);
+            int toX = Math.Max(point1.x, point2.x);
 
-            int fromY = Math.Min(point1.Y, point2.Y);
-            int toY = Math.Max(point1.Y, point2.Y);
+            int fromY = Math.Min(point1.y, point2.y);
+            int toY = Math.Max(point1.y, point2.y);
 
-            int fromZ = Math.Min(point1.Z, point2.Z);
-            int toZ = Math.Max(point1.Z, point2.Z);
+            int fromZ = Math.Min(point1.z, point2.z);
+            int toZ = Math.Max(point1.z, point2.z);
 
             return (new Dector3(fromX, fromY, fromZ), new Dector3(toX, toY, toZ));
         }
@@ -87,12 +89,12 @@ namespace WaveFunctionCollapse3D.Util
         public Dector3 ToOne()
         {
             Dector3 result = new Dector3();
-            if (X != 0)
-                result.X = X / Math.Abs(X);
-            if (Y != 0)
-                result.Y = Y / Math.Abs(Y);
-            if (Z != 0)
-                result.Z = Z / Math.Abs(Z);
+            if (x != 0)
+                result.x = x / Math.Abs(x);
+            if (y != 0)
+                result.y = y / Math.Abs(y);
+            if (z != 0)
+                result.z = z / Math.Abs(z);
             return result;
         }
 
@@ -114,12 +116,12 @@ namespace WaveFunctionCollapse3D.Util
 
         public static Dector3 MultiplyCorrespondingAxis(Dector3 d1, Dector3 d2)
         {
-            return new Dector3(d1.X * d2.X, d1.Y * d2.Y, d1.Z * d2.Z);
+            return new Dector3(d1.x * d2.x, d1.y * d2.y, d1.z * d2.z);
         }
 
         public Dector3 WithAbsAxis()
         {
-            return new Dector3(Math.Abs(X), Math.Abs(Y), Math.Abs(Z));
+            return new Dector3(Math.Abs(x), Math.Abs(y), Math.Abs(z));
         }
 
         public Dector3 Rotated(int rotation)
@@ -131,32 +133,46 @@ namespace WaveFunctionCollapse3D.Util
              * y - up
              * x - right
              */
-            
+
             // TODO: keep eye on this, possible wrong calculations
             Dector3 ones = ToOne();
-            Dector3 xVector = new Dector3(ones.X, 0, 0);
-            Dector3 yVector = new Dector3(0, ones.Y, 0);
-            Dector3 zVector = new Dector3(0, 0, ones.Z);
+            Dector3 xVector = new Dector3(ones.x, 0, 0);
+            Dector3 yVector = new Dector3(0, ones.y, 0);
+            Dector3 zVector = new Dector3(0, 0, ones.z);
 
             int indexX = 2 + (GetDirectionIndex(xVector) + rotation) % 4;
             int indexY = 2 + (GetDirectionIndex(yVector) + rotation) % 4;
             int indexZ = 2 + (GetDirectionIndex(zVector) + rotation) % 4;
 
-            Dector3 turnedX = GetDirection(indexX) * X;
-            Dector3 turnedY = GetDirection(indexY) * Y;
-            Dector3 turnedZ = GetDirection(indexZ) * Z;
-            
+            Dector3 turnedX = GetDirection(indexX) * x;
+            Dector3 turnedY = GetDirection(indexY) * y;
+            Dector3 turnedZ = GetDirection(indexZ) * z;
+
             Dector3 result = turnedX + turnedY + turnedZ;
-            
+
             return result;
+        }
+
+        public static Vector3 operator +(Dector3 d, Vector3 v)
+        {
+            return new Vector3(
+                d.x + v.x,
+                d.y + v.y,
+                d.z + v.z
+            );
+        }
+        
+        public static Vector3 operator +(Vector3 v, Dector3 d)
+        {
+            return d + v;
         }
 
         public static Dector3 operator +(Dector3 d1, Dector3 d2)
         {
             return new Dector3(
-                d1.X + d2.X,
-                d1.Y + d2.Y,
-                d1.Z + d2.Z
+                d1.x + d2.x,
+                d1.y + d2.y,
+                d1.z + d2.z
             );
         }
 
@@ -167,15 +183,15 @@ namespace WaveFunctionCollapse3D.Util
 
         public static Dector3 operator *(Dector3 dector3, int multiplier)
         {
-            dector3.X *= multiplier;
-            dector3.Y *= multiplier;
-            dector3.Z *= multiplier;
+            dector3.x *= multiplier;
+            dector3.y *= multiplier;
+            dector3.z *= multiplier;
             return dector3;
         }
 
         public override string ToString()
         {
-            return $"D({X}, {Y}, {Z})";
+            return $"D({x}, {y}, {z})";
         }
     }
 }

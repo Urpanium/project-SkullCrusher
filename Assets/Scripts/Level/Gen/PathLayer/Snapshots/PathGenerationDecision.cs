@@ -1,4 +1,5 @@
-﻿using WaveFunctionCollapse3D.Util;
+﻿using Level.Gen.Util;
+using Level.Gen.VisualLayer;
 using WaveFunctionCollapse3D.VisualLayer;
 
 namespace WaveFunctionCollapse3D.PathLayer.Snapshots

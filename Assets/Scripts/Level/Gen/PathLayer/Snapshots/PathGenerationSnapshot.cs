@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Level.Gen.PathLayer.PathGeneration;
+using Level.Gen.Util;
+using Level.Gen.VisualLayer;
 using WaveFunctionCollapse3D.PathLayer.PathGeneration;
-using WaveFunctionCollapse3D.Util;
 using WaveFunctionCollapse3D.VisualLayer;
 
 namespace WaveFunctionCollapse3D.PathLayer.Snapshots

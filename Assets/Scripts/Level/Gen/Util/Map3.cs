@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WaveFunctionCollapse3D.Util
+namespace Level.Gen.Util
 {
     public class Map3<T> where T : class
     {
@@ -9,7 +9,7 @@ namespace WaveFunctionCollapse3D.Util
 
         public Map3(Dector3 size)
         {
-            _map = new T[size.X, size.Y, size.Z];
+            _map = new T[size.x, size.y, size.z];
             Size = size;
         }
 
@@ -22,32 +22,32 @@ namespace WaveFunctionCollapse3D.Util
         public T GetTile(Dector3 position)
         {
             IsPositionCorrect(position);
-            return _map[position.X, position.Y, position.Z];
+            return _map[position.x, position.y, position.z];
         }
 
         public void SetTile(Dector3 position, T tile)
         {
             IsPositionCorrect(position);
-            _map[position.X, position.Y, position.Z] = tile;
+            _map[position.x, position.y, position.z] = tile;
         }
 
         public void SetTile(int x, int y, int z, T tile)
         {
             Dector3 position = new Dector3(x, y, z);
             IsPositionCorrect(position);
-            _map[position.X, position.Y, position.Z] = tile;
+            _map[position.x, position.y, position.z] = tile;
         }
 
         public void Clear()
         {
-            _map = new T[Size.X, Size.Y, Size.Z];
+            _map = new T[Size.x, Size.y, Size.z];
         }
 
         public bool IsValidPosition(Dector3 position)
         {
-            return position.X < 0 || position.X > Size.X
-                                  || position.Y < 0 || position.Y > Size.Y
-                                  || position.Z < 0 || position.Z > Size.Z;
+            return position.x < 0 || position.x > Size.x
+                                  || position.y < 0 || position.y > Size.y
+                                  || position.z < 0 || position.z > Size.z;
         }
 
 

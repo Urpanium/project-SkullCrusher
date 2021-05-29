@@ -1,7 +1,8 @@
 ﻿using System;
-using WaveFunctionCollapse3D.Util;
+using Level.Gen.Util;
+using WaveFunctionCollapse3D.PathLayer.PathGeneration;
 
-namespace WaveFunctionCollapse3D.PathLayer.PathGeneration
+namespace Level.Gen.PathLayer.PathGeneration
 {
     public class PathNode
     {
@@ -122,7 +123,7 @@ namespace WaveFunctionCollapse3D.PathLayer.PathGeneration
 
         public override string ToString()
         {
-            return $"PathNode ({Position.X};{Position.Y},{Position.Z})";
+            return $"PathNode ({Position.x};{Position.y},{Position.z})";
         }
     }
 }

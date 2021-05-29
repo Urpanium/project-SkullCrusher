@@ -55,6 +55,10 @@
      <Compile Include="Assets\Scripts\IK\IK.cs" />
      <Compile Include="Assets\Scripts\AI\AiPatrolPointSet.cs" />
      <Compile Include="Assets\Scripts\Character\Controller.cs" />
+     <Compile Include="Assets\Scripts\Level\Gen\PathLayer\Path\PathGenerator.cs" />
+     <Compile Include="Assets\Scripts\Level\Gen\PathLayer\Path\PathGeneratorConfig.cs" />
+     <Compile Include="Assets\Scripts\Level\Gen\PathLayer\Path\PathPrototypes\PathPrototype.cs" />
+     <Compile Include="Assets\Scripts\Level\Gen\PathLayer\Path\PathPrototypes\PathSocket.cs" />
      <Compile Include="Assets\Scripts\Weapons\WeaponParameters.cs" />
      <Compile Include="Assets\Scripts\PostProcessing\ImageEffect.cs" />
      <Compile Include="Assets\Scripts\Util\Gravity.cs" />
@@ -79,13 +83,12 @@
      <Compile Include="Assets\Scripts\Character\CameraZoom.cs" />
      <Compile Include="Assets\Scripts\Weapons\BulletManager.cs" />
      <Compile Include="Assets\Scripts\Preferences\Settings.cs" />
-     <Compile Include="Assets\Scripts\Level\Gen\PathLayer\PathGeneration\PathGenerator.cs" />
+     <Compile Include="Assets\Scripts\Level\Gen\PathLayer\PathGeneration\PathGeneratorOldv2.cs" />
      <Compile Include="Assets\Scripts\Level\Gen\PathLayer\PathGeneration\PathNode.cs" />
      <Compile Include="Assets\Scripts\Level\Gen\VisualLayer\Prototype.cs" />
      <Compile Include="Assets\Scripts\Level\Gen\VisualLayer\WaveFunctionIterator.cs" />
      <Compile Include="Assets\Scripts\Level\Gen\PathLayer\Tiles\Tile.cs" />
      <Compile Include="Assets\Scripts\Level\Gen\Util\Map3.cs" />
-     <Compile Include="Assets\Scripts\Level\Gen\PathLayer\PathGeneration\PathGeneratorConfig.cs" />
      <Compile Include="Assets\Scripts\Level\Gen\PathLayer\PathGeneration\PathNodeType.cs" />
      <Compile Include="Assets\Scripts\Level\Gen\VisualLayer\Sockets\SocketPosition.cs" />
      <Compile Include="Assets\Scripts\Level\Gen\PathLayer\Tiles\TileType.cs" />
@@ -97,9 +100,11 @@
      <Compile Include="Assets\Scripts\Level\Gen\VisualLayer\Sockets\SocketManager.cs" />
      <Compile Include="Assets\Scripts\Level\Gen\PathLayer\Snapshots\GenerationStructure.cs" />
      <Compile Include="Assets\Scripts\Level\Gen\VisualLayer\Sockets\SocketType.cs" />
-     <Compile Include="Assets\Scripts\Level\Gen\PathLayer\PathGeneration\PathGeneratorOld.cs" />
+     <Compile Include="Assets\Scripts\Level\Gen\PathLayer\PathGeneration\PathGeneratorOldv1.cs" />
      <Compile Include="Assets\Scripts\Level\Gen\Util\Dector3.cs" />
      <Compile Include="Assets\Scripts\Level\Gen\Debug\PathNodesVisualizer.cs" />
+     <Compile Include="Assets\Scripts\Level\Gen\WorldGenerator.cs" />
+     <Compile Include="Assets\Scripts\Level\GenScripts\PrototypeInfo.cs" />
      <None Include="Assets\Shaders\PostProcessing\ArtifactImageEffect.shader" />
      <None Include="Assets\Shaders\Surface Diffuse.shader" />
  <Reference Include="UnityEngine">
@@ -723,8 +728,6 @@
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Users/maksi/Desktop/Projects/Unity/project-SkullCrusher/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
  </Reference>
-  </ItemGroup>
-  <ItemGroup>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
