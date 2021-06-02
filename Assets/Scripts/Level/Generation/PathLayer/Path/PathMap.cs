@@ -13,12 +13,13 @@ namespace Level.Generation.PathLayer.Path
         public PathMap(Dector3 mapSize)
         {
             size = mapSize;
+            //ValidatePosition(Dector3.Back);
             map = new byte[size.x, size.y, size.z];
             for (int x = 0; x < map.GetLength(0); x++)
             {
-                for (int y = 0; y < map.GetLength(0); y++)
+                for (int y = 0; y < map.GetLength(1); y++)
                 {
-                    for (int z = 0; z < map.GetLength(0); z++)
+                    for (int z = 0; z < map.GetLength(2); z++)
                     {
                         map[x, y, z] = PathTile.MaxByteValue;
                     }
@@ -30,6 +31,7 @@ namespace Level.Generation.PathLayer.Path
         {
             return GetTile(x, y, z) > PathTile.MaxByteValue;
         }
+
         public bool IsTileEmpty(Dector3 position)
         {
             return GetTile(position) > PathTile.MaxByteValue;
@@ -43,6 +45,7 @@ namespace Level.Generation.PathLayer.Path
 
         public byte GetTile(Dector3 position)
         {
+            ValidatePosition(position);
             return map[position.x, position.y, position.z];
         }
 
@@ -71,11 +74,11 @@ namespace Level.Generation.PathLayer.Path
 
         public void ValidatePosition(Dector3 position)
         {
-            if (position.x < 0 || position.x > size.x
-                               || position.y < 0 || position.y > size.y
-                               || position.z < 0 || position.z > size.z)
+            if (position.x < 0 || position.x >= size.x
+                               || position.y < 0 || position.y >= size.y
+                               || position.z < 0 || position.z >= size.z)
             {
-                throw new Exception($"Invalid position: {position}");
+                throw new Exception($"Invalid position: {position}, mapSize is {size}");
             }
         }
     }

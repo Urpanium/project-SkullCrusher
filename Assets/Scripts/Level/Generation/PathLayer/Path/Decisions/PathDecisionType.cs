@@ -3,7 +3,8 @@
     public enum PathDecisionType
     {
         Corridor = 0,
-        Room = 1,
-        Prototype
+        Room,
+        Prototype,
+        End
     }
 }

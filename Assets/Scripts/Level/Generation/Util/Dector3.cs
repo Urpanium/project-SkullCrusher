@@ -8,7 +8,7 @@ namespace Level.Generation.Util
     public class Dector3
     {
         // Discrete Vector3
-        
+
         public int x;
         public int y;
         public int z;
@@ -119,6 +119,12 @@ namespace Level.Generation.Util
             return result;
         }
 
+        public static int Distance(Dector3 d1, Dector3 d2)
+        {
+            Dector3 delta = (d1 - d2).WithAbsAxis();
+            return Math.Max(delta.x, Math.Max(delta.y, delta.z));
+        }
+
         public static Dector3 GetDirection(int index)
         {
             return _directions[index];
@@ -213,6 +219,34 @@ namespace Level.Generation.Util
         public static Dector3 operator /(Dector3 d, int i)
         {
             return new Dector3(d.x / i, d.y / i, d.z / i);
+        }
+
+        
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            Dector3 other = (Dector3) obj;
+            return other.x == x && other.y == y && other.z == z;
+        }
+
+        protected bool Equals(Dector3 other)
+        {
+            return x == other.x && y == other.y && z == other.z;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = x;
+                hashCode = (hashCode * 397) ^ y;
+                hashCode = (hashCode * 397) ^ z;
+                return hashCode;
+            }
         }
 
         public override string ToString()

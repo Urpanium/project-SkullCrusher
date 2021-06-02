@@ -17,6 +17,9 @@ namespace Level.Generation.PathLayer.Path
          */
 
         public int perEntryDecisionsLimit;
+        
+        [Range(0.01f, 10)]
+        public float mapSizeSafetyMultiplier;
 
         /*
          * path length parameters

@@ -16,10 +16,15 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
             random = new Random(config.seed);
         }
 
-        protected static Dector3 GetEntryDirection(PathMap map, Dector3 entry)
+        protected static Dector3 GetEntryDirection(PathMap map, Dector3 entry, int offset = 0)
         {
-            foreach (Dector3 direction in Dector3.Directions)
+            Random directionRandom = new Random(entry.x + entry.y * 10 + entry.z * 100);
+            int randomOffset = directionRandom.Next(Dector3.Directions.Length);
+            
+            for (int i = 0; i < Dector3.Directions.Length; i++)
             {
+                int directionIndex = (i + offset + randomOffset) % Dector3.Directions.Length;
+                Dector3 direction = Dector3.Directions[directionIndex];
                 if (!map.IsTileEmpty(entry + direction) && !map.IsTileEmpty(entry - direction))
                 {
                     return direction;

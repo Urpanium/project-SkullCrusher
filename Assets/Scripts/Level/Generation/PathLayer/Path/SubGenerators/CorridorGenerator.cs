@@ -17,19 +17,20 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
         }
 
 
-        public Cuboid GenerateCorridor(PathMap map, Dector3 entry, out long variants)
+        public Cuboid GenerateCorridor(PathMap map, Dector3 entry, out Dector3 to, int decisionsCount = 0)
         {
-            Dector3 entryDirection = GetEntryDirection(map, entry);
+            Dector3 entryDirection = GetEntryDirection(map, entry, decisionsCount);
             int entryDirectionIndex = Dector3.GetDirectionIndex(entryDirection);
             
-            Dector3 maxSize = GetMaxCorridorSize(map, entry, out variants);
+            Dector3 maxSize = GetMaxCorridorSize(map, entry);
             Dector3 minSize = new Dector3(1, 1, config.MinimumCorridorsLengths[entryDirectionIndex]);
 
             Dector3 size = Dector3.Random(random, minSize, maxSize);
+            to = entry + entryDirection * size.z;
             return CorridorToCuboid(entry, entry + entryDirection * size.z, size.x, size.y);
         }
 
-        private Dector3 GetMaxCorridorSize(PathMap map, Dector3 entry, out long variants)
+        private Dector3 GetMaxCorridorSize(PathMap map, Dector3 entry)
         {
             Dector3 entryDirection = GetEntryDirection(map, entry);
             int entryDirectionIndex = Dector3.GetDirectionIndex(entryDirection);
@@ -42,7 +43,6 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
             );
 
             Dector3 size = new Dector3();
-            variants = 0;
             /*
              * length is in priority
              * width and height can be swapped
@@ -58,7 +58,6 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
                             size.x = width;
                             size.y = height;
                             size.z = length;
-                            variants++;
                         }
                     }
                 }

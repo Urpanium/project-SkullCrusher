@@ -53,19 +53,18 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\IK\IK.cs" />
-     <Compile Include="Assets\Scripts\Level\Generation\PathLayer\Path\Decisions\PathDecision.cs" />
-     <Compile Include="Assets\Scripts\Level\Generation\PathLayer\Path\Decisions\PathDecisionType.cs" />
      <Compile Include="Assets\Scripts\Level\Generation\PathLayer\Path\PathGeneratorConfig.cs" />
      <Compile Include="Assets\Scripts\AI\AiPatrolPointSet.cs" />
      <Compile Include="Assets\Scripts\Character\Controller.cs" />
-     <Compile Include="Assets\Scripts\Level\Generation\PathLayer\Path\SubGenerators\PrototypeGenerator.cs" />
      <Compile Include="Assets\Scripts\Weapons\WeaponParameters.cs" />
      <Compile Include="Assets\Scripts\PostProcessing\ImageEffect.cs" />
+     <Compile Include="Assets\Scripts\Level\Generation\PathLayer\Path\SubGenerators\PrototypeGenerator.cs" />
      <Compile Include="Assets\Scripts\Util\Gravity.cs" />
      <Compile Include="Assets\Scripts\Level\Generation\PathLayer\Tiles\Tile.cs" />
      <Compile Include="Assets\Scripts\Debug\EscapeHidePointer.cs" />
      <Compile Include="Assets\Scripts\Level\Generation\PathLayer\Path\SubGenerators\CorridorGenerator.cs" />
      <Compile Include="Assets\Scripts\Level\Generation\PathLayer\Path\Prototypes\PathPrototype.cs" />
+     <Compile Include="Assets\Scripts\Level\Generation\PathLayer\Path\Decisions\PathDecision.cs" />
      <Compile Include="Assets\Scripts\Level\GenScripts\PrototypeInfo.cs" />
      <Compile Include="Assets\Scripts\Level\Generation\VisualLayer\Sockets\SocketPosition.cs" />
      <Compile Include="Assets\Scripts\Level\Generation\VisualLayer\Sockets\Socket.cs" />
@@ -111,6 +110,7 @@
      <Compile Include="Assets\Scripts\Level\Generation\PathLayer\Tiles\TileType.cs" />
      <Compile Include="Assets\Scripts\Level\Generation\Util\Dector3.cs" />
      <Compile Include="Assets\Scripts\Weapons\BulletManager.cs" />
+     <Compile Include="Assets\Scripts\Level\Generation\PathLayer\Path\Decisions\PathDecisionType.cs" />
      <Compile Include="Assets\Scripts\Preferences\Settings.cs" />
      <None Include="Assets\Shaders\PostProcessing\ArtifactImageEffect.shader" />
      <None Include="Assets\Scripts\Level\Generation\readme.txt" />
@@ -736,6 +736,8 @@
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Users/maksi/Desktop/Projects/Unity/project-SkullCrusher/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
  </Reference>
+  </ItemGroup>
+  <ItemGroup>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

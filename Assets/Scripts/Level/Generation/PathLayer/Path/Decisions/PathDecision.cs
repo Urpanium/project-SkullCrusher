@@ -13,13 +13,8 @@ namespace Level.Generation.PathLayer.Path.Decisions
          * only used by corridor
          */
 
-        public Dector3 direction;
-
-        public int length;
-
-        public int width;
-
-        public int height;
+        public Dector3 size;
+        public Dector3 to;
 
         /*
          * only used by prototypes
