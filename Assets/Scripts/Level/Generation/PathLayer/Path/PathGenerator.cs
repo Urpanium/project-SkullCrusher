@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Level.Generation.PathLayer.Path.Decisions;
 using Level.Generation.PathLayer.Path.Prototypes;
+using Level.Generation.PathLayer.Path.Snapshots;
+using Level.Generation.PathLayer.Path.SubGenerators;
 using Level.Generation.Util;
 
 namespace Level.Generation.PathLayer.Path
@@ -11,6 +14,26 @@ namespace Level.Generation.PathLayer.Path
 
         private List<PathPrototype> mustSpawnPrototypes;
         private List<PathPrototype> canSpawnPrototypes;
+
+        private List<PathSnapshot> history;
+
+        /*
+         * generation stuff
+         */
+        private Random random;
+
+        private int currentPathLength;
+
+        private List<PathPrototype> currentMustSpawnPrototypes;
+        private int currentMustSpawnOffset;
+
+        private List<PathPrototype> currentCanSpawnPrototypes;
+        private int currentCanSpawnOffset;
+
+        private CorridorGenerator corridorGenerator;
+        private RoomGenerator roomGenerator;
+
+        private List<Dector3> currentEntries;
 
         private bool debugMode;
 
@@ -23,7 +46,10 @@ namespace Level.Generation.PathLayer.Path
             this.config = config;
             this.mustSpawnPrototypes = mustSpawnPrototypes;
             this.canSpawnPrototypes = canSpawnPrototypes;
+
             debugMode = mustSpawnPrototypes.Count < 2;
+
+            Reset();
         }
 
         public PathMap Generate()
@@ -31,15 +57,52 @@ namespace Level.Generation.PathLayer.Path
             Dector3 mapSize = GetMapSize();
             PathMap map = new PathMap(mapSize);
 
-            /*
-             * GENERATE SOMETHING
-             */
 
             return map;
         }
 
+        private PathDecision Decide(int decisionsCount)
+        {
+            /*
+             * so let's start with checking if we
+             * are succeeding in our prototypes
+             * placement
+             */
+            PathDecision decision = new PathDecision();
+            
+            int distanceToPrototype = config.minimumOffsetBetweenMustSpawnPrototypes - currentMustSpawnOffset;
 
-        private Dector3 GetMapSize()
+            float pathProgress = currentPathLength / ((config.minimumPathLength + config.maximumPathLength) * 0.5f);
+            float prototypeProgress = (float) (mustSpawnPrototypes.Count - currentMustSpawnPrototypes.Count) /
+                                      mustSpawnPrototypes.Count;
+            if (distanceToPrototype < 0)
+            {
+                if (pathProgress > prototypeProgress)
+                {
+                    /*
+                     * TODO: place must spawn prototype
+                     */
+                    decision.type = PathDecisionType.Prototype;
+                }
+            }
+            /*
+             * TODO: make decision
+             */
+            throw new NotImplementedException();
+        }
+
+        private bool TryEvaluateDecision(PathDecision decision)
+        {
+            /*
+             * TODO: check if can apply decision and apply if can
+             * else need to try another decision
+             * if all decisions are tried, rollback to last snapshot
+             */
+            throw new NotImplementedException();
+        }
+
+
+        private Dector3 GetMapSize(float safetyMultiplier = 2.0f)
         {
             /*
              * remember: no LINQ
@@ -65,13 +128,25 @@ namespace Level.Generation.PathLayer.Path
             {
                 float multiplier = configPathLength * config.MaximumCorridorsLengths[i] *
                                    pathDirectionsWeightsNormalized[i];
-                corridorsSizes += Dector3.Directions[i] * (int) Math.Round(multiplier + 0.4f);
+                corridorsSizes += Dector3.Directions[i] * (int) Math.Round(multiplier * safetyMultiplier + 0.4f);
             }
 
 
             Dector3 mapSize = (corridorsSizes + prototypesSizes) * 2;
-            
+
             return mapSize;
+        }
+
+        public void Reset()
+        {
+            random = new Random(config.seed);
+
+            currentPathLength = 0;
+
+            corridorGenerator = new CorridorGenerator(config);
+            roomGenerator = new RoomGenerator(config);
+
+            currentEntries = new List<Dector3>();
         }
     }
 }

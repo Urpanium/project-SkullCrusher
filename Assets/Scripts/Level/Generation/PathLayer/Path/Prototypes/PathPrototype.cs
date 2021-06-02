@@ -8,6 +8,9 @@ namespace Level.Generation.PathLayer.Path.Prototypes
     public class PathPrototype
     {
         public Dector3 size;
+
+        public int rotation;
+
         public List<Dector3> entries;
 
         public PathPrototype(Dector3 size, IEnumerable<Dector3> entries)
@@ -19,8 +22,20 @@ namespace Level.Generation.PathLayer.Path.Prototypes
                 throw new Exception($"Too many entries received: {this.entries.Count}");
             }
         }
-        
-        
+
+        public List<Dector3> GetRotatedEntries()
+        {
+            Dector3 center = size / 2;
+            List<Dector3> result = entries;
+            for (int i = 0; i < entries.Count; i++)
+            {
+                result[i] = center + (result[i] - center).Rotated(rotation);
+            }
+
+            return result;
+        }
+
+
         private int GetSurfaceSquare()
         {
             int xFaces = size.z * size.y * 2;

@@ -231,7 +231,6 @@ namespace AI
 
         private void IdleStateTransitionCheck()
         {
-            // TODO: check conditions to change state
 
             float playerVisibility = aiAgent.GetPlayerVisibility();
 

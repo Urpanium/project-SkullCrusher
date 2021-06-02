@@ -13,6 +13,12 @@ namespace Level.Generation.PathLayer.Path
         public int seed ;
 
         /*
+         * limit the amount of decisions to speed up generation
+         */
+
+        public int perEntryDecisionsLimit;
+        
+        /*
          * path length parameters
          */
         public int minimumPathLength ;

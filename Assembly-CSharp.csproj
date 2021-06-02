@@ -53,6 +53,8 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\IK\IK.cs" />
+     <Compile Include="Assets\Scripts\Level\Generation\PathLayer\Path\Decisions\PathDecision.cs" />
+     <Compile Include="Assets\Scripts\Level\Generation\PathLayer\Path\Decisions\PathDecisionType.cs" />
      <Compile Include="Assets\Scripts\Level\Generation\PathLayer\Path\PathGeneratorConfig.cs" />
      <Compile Include="Assets\Scripts\AI\AiPatrolPointSet.cs" />
      <Compile Include="Assets\Scripts\Character\Controller.cs" />
@@ -733,8 +735,6 @@
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Users/maksi/Desktop/Projects/Unity/project-SkullCrusher/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
  </Reference>
-  </ItemGroup>
-  <ItemGroup>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

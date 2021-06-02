@@ -63,7 +63,7 @@ namespace Level.Generation.Util
              * random x, random y and random z make random dector
              */
             Dector3 randomDector3 = new Dector3(randomX, randomY, randomZ);
-            
+
             /*
              * return random dector
              */
@@ -181,7 +181,7 @@ namespace Level.Generation.Util
                 d.z + v.z
             );
         }
-        
+
         public static Vector3 operator +(Vector3 v, Dector3 d)
         {
             return d + v;
@@ -207,6 +207,11 @@ namespace Level.Generation.Util
             dector3.y *= multiplier;
             dector3.z *= multiplier;
             return dector3;
+        }
+
+        public static Dector3 operator /(Dector3 d, int i)
+        {
+            return new Dector3(d.x / i, d.y / i, d.z / i);
         }
 
         public override string ToString()

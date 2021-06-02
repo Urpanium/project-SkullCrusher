@@ -47,11 +47,11 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
              * length is in priority
              * width and height can be swapped
              */
-            for (int length = minPossibleSize.z; length < maxPossibleSize.z; length++)
+            for (short length = minPossibleSize.z; length < maxPossibleSize.z; length++)
             {
-                for (int width = minPossibleSize.x; width < maxPossibleSize.x; width++)
+                for (short width = minPossibleSize.x; width < maxPossibleSize.x; width++)
                 {
-                    for (int height = minPossibleSize.y; height < maxPossibleSize.y; height++)
+                    for (short height = minPossibleSize.y; height < maxPossibleSize.y; height++)
                     {
                         if (CanFitCorridor(map, entry, entry + entryDirection * length, width, height))
                         {
