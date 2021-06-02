@@ -21,7 +21,13 @@ namespace Level.Generation.PathLayer.Path
         public bool CanGoToBack { get; set; }
         public bool CanGoToRight { get; set; }
 
-        public const byte MaxByteValue = 64;
+        /*
+         * defines if we can change access to tile
+         * true when it's not a part of prototype (corridor, room)
+         */
+        public bool Changeable { get; set; }
+
+        public const byte MaxByteValue = 128; // 2 ^ 7 for 6 sides and changeable bit
 
         public PathTile()
         {
@@ -36,7 +42,8 @@ namespace Level.Generation.PathLayer.Path
                 CanGoToForward,
                 CanGoToLeft,
                 CanGoToBack,
-                CanGoToRight
+                CanGoToRight,
+                Changeable
             };
             byte result = 0;
             foreach (var bit in array)
@@ -67,6 +74,8 @@ namespace Level.Generation.PathLayer.Path
             for (int i = 0; i < array.Length; i++)
             {
                 pathTile.SetDirectionAccess(i, array[i]);
+                if (i == array.Length - 1)
+                    pathTile.Changeable = array[i];
             }
 
             return pathTile;

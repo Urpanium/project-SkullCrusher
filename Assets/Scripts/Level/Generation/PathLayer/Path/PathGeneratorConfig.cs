@@ -5,55 +5,54 @@ namespace Level.Generation.PathLayer.Path
 {
     [Serializable]
     [CreateAssetMenu(fileName = "PathGenerationConfig", menuName = "Path Generation Config", order = 51)]
-    public class PathGeneratorConfig: ScriptableObject
+    public class PathGeneratorConfig : ScriptableObject
     {
         /*
          * seed (wow, really helpful)
          */
-        public int seed ;
+        public int seed;
 
         /*
          * limit the amount of decisions to speed up generation
          */
 
         public int perEntryDecisionsLimit;
-        
+
         /*
          * path length parameters
          */
-        public int minimumPathLength ;
+        public int minimumPathLength;
 
-        public int maximumPathLength ;
+        public int maximumPathLength;
 
 
         /*
          * exist because we don't want previous
          * and current level to overlap
          */
-        public int maximumEndPointCorridorLength ;
+        public int maximumEndPointCorridorLength;
 
         /*
          *possibility for each node to spawn after minimum reached
          */
         // TODO: remove if not used
-        public float minimumPathContinueChance ;
+        public float minimumPathContinueChance;
 
-        public int minimumOffsetBetweenMustSpawnPrototypes ;
+        public int minimumOffsetBetweenMustSpawnPrototypes;
 
-        public int minimumOffsetBetweenCanSpawnPrototypes ;
+        public int minimumOffsetBetweenCanSpawnPrototypes;
 
         /*
          * possibilities of generation to go in direction for example,
          * in some kind of underground laboratories we can make generator
          * build more vertical path
          */
-        [Header("Directions Weights")]
-        public float pathTopDirectionWeight ;
-        public float pathBottomDirectionWeight ;
-        public float pathForwardDirectionWeight ;
-        public float pathLeftDirectionWeight ;
-        public float pathBackDirectionWeight ;
-        public float pathRightDirectionWeight ;
+        [Header("Directions Weights")] public float pathTopDirectionWeight;
+        public float pathBottomDirectionWeight;
+        public float pathForwardDirectionWeight;
+        public float pathLeftDirectionWeight;
+        public float pathBackDirectionWeight;
+        public float pathRightDirectionWeight;
 
         /*
          * just weights
@@ -80,41 +79,35 @@ namespace Level.Generation.PathLayer.Path
         /*
          * ranges of length for each direction
          */
-        [Header("Top")]
-        public int minimumTopCorridorLength ;
-        public int maximumTopCorridorLength ;
-        public int maximumTopCorridorWidth ;
-        public int maximumTopCorridorHeight ;
+        [Header("Top")] public int minimumTopCorridorLength;
+        public int maximumTopCorridorLength;
+        public int maximumTopCorridorWidth;
+        public int maximumTopCorridorHeight;
 
-        [Header("Bottom")]
-        public int minimumBottomCorridorLength ;
-        public int maximumBottomCorridorLength ;
-        public int maximumBottomCorridorWidth ;
-        public int maximumBottomCorridorHeight ;
+        [Header("Bottom")] public int minimumBottomCorridorLength;
+        public int maximumBottomCorridorLength;
+        public int maximumBottomCorridorWidth;
+        public int maximumBottomCorridorHeight;
 
-        [Header("Forward")]
-        public int minimumForwardCorridorLength ;
-        public int maximumForwardCorridorLength ;
-        public int maximumForwardCorridorWidth ;
-        public int maximumForwardCorridorHeight ;
+        [Header("Forward")] public int minimumForwardCorridorLength;
+        public int maximumForwardCorridorLength;
+        public int maximumForwardCorridorWidth;
+        public int maximumForwardCorridorHeight;
 
-        [Header("Left")]
-        public int minimumLeftCorridorLength ;
-        public int maximumLeftCorridorLength ;
-        public int maximumLeftCorridorWidth ;
-        public int maximumLeftCorridorHeight ;
+        [Header("Left")] public int minimumLeftCorridorLength;
+        public int maximumLeftCorridorLength;
+        public int maximumLeftCorridorWidth;
+        public int maximumLeftCorridorHeight;
 
-        [Header("Back")]
-        public int minimumBackCorridorLength ;
-        public int maximumBackCorridorLength ;
-        public int maximumBackCorridorWidth ;
-        public int maximumBackCorridorHeight ;
+        [Header("Back")] public int minimumBackCorridorLength;
+        public int maximumBackCorridorLength;
+        public int maximumBackCorridorWidth;
+        public int maximumBackCorridorHeight;
 
-        [Header("Right")]
-        public int minimumRightCorridorLength ;
-        public int maximumRightCorridorLength ;
-        public int maximumRightCorridorWidth ;
-        public int maximumRightCorridorHeight ;
+        [Header("Right")] public int minimumRightCorridorLength;
+        public int maximumRightCorridorLength;
+        public int maximumRightCorridorWidth;
+        public int maximumRightCorridorHeight;
 
         public int[] MinimumCorridorsLengths
         {
@@ -184,13 +177,12 @@ namespace Level.Generation.PathLayer.Path
             }
         }
 
-        [Header("Rooms")]
-        public int minimumRoomXSize ;
-        public int minimumRoomYSize ;
-        public int minimumRoomZSize ;
+        [Header("Rooms")] public int minimumRoomXSize;
+        public int minimumRoomYSize;
+        public int minimumRoomZSize;
 
-        public int maximumRoomXSize ;
-        public int maximumRoomYSize ;
-        public int maximumRoomZSize ;
+        public int maximumRoomXSize;
+        public int maximumRoomYSize;
+        public int maximumRoomZSize;
     }
 }

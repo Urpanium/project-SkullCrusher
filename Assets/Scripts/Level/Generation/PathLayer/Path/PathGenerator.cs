@@ -20,6 +20,8 @@ namespace Level.Generation.PathLayer.Path
         /*
          * generation stuff
          */
+
+        private PathMap map;
         private Random random;
 
         private int currentPathLength;
@@ -32,6 +34,7 @@ namespace Level.Generation.PathLayer.Path
 
         private CorridorGenerator corridorGenerator;
         private RoomGenerator roomGenerator;
+        private PrototypeGenerator prototypeGenerator;
 
         private List<Dector3> currentEntries;
 
@@ -54,41 +57,113 @@ namespace Level.Generation.PathLayer.Path
 
         public PathMap Generate()
         {
-            Dector3 mapSize = GetMapSize();
-            PathMap map = new PathMap(mapSize);
-
-
             return map;
         }
 
-        private PathDecision Decide(int decisionsCount)
+        private PathDecision Decide(int decisionsCount = 0, PathDecision previousDecision = null)
         {
-            /*
-             * so let's start with checking if we
-             * are succeeding in our prototypes
-             * placement
-             */
-            PathDecision decision = new PathDecision();
-            
-            int distanceToPrototype = config.minimumOffsetBetweenMustSpawnPrototypes - currentMustSpawnOffset;
+            Random decisionRandom = new Random(config.seed);
+            int entryIndex = (decisionRandom.Next(currentEntries.Count) + decisionsCount) % currentEntries.Count;
+            Dector3 entry = currentEntries[entryIndex];
 
-            float pathProgress = currentPathLength / ((config.minimumPathLength + config.maximumPathLength) * 0.5f);
-            float prototypeProgress = (float) (mustSpawnPrototypes.Count - currentMustSpawnPrototypes.Count) /
-                                      mustSpawnPrototypes.Count;
-            if (distanceToPrototype < 0)
+
+            PathDecision decision = new PathDecision();
+
+
+            /*
+             * if we have some prototypes that need to be placed
+             */
+            if (currentMustSpawnPrototypes.Count > 0)
             {
-                if (pathProgress > prototypeProgress)
+                
+                /*
+                 * TODO: end placing prototype, need some work, but enough for now
+                 */
+                if ((debugMode || currentMustSpawnPrototypes.Count == 1)
+                    && currentPathLength > config.minimumPathLength 
+                    && currentPathLength < config.maximumPathLength)
                 {
-                    /*
-                     * TODO: place must spawn prototype
-                     */
-                    decision.type = PathDecisionType.Prototype;
+                    if (!(random.NextDouble() < config.minimumPathContinueChance))
+                    {
+                        PathPrototype prototype = currentMustSpawnPrototypes[0];
+
+                        if (prototypeGenerator.TryFitPrototype(map, prototype, entry, out Dector3 minPoint,
+                            out int rotation))
+                        {
+                            decision.type = PathDecisionType.Prototype;
+                            decision.entry = minPoint;
+                            decision.rotation = rotation;
+                            decision.prototypeIndex = mustSpawnPrototypes.IndexOf(prototype);
+                            return decision;
+                        }
+                    }
+                }
+
+                int distanceToPrototype = config.minimumOffsetBetweenMustSpawnPrototypes - currentMustSpawnOffset;
+
+                float pathProgress = currentPathLength / ((config.minimumPathLength + config.maximumPathLength) * 0.5f);
+                float prototypeProgress = (float) (mustSpawnPrototypes.Count - currentMustSpawnPrototypes.Count) /
+                                          mustSpawnPrototypes.Count;
+                
+                
+                
+                /*
+                 * if we passed more tiles than must spawn offset
+                 */
+
+                if (distanceToPrototype < 0)
+                {
+                    if (pathProgress > prototypeProgress)
+                    {
+                        /*
+                         * TODO: place must spawn prototype
+                         */
+                        //decision.type = PathDecisionType.Prototype;
+                        PathPrototype prototype = currentMustSpawnPrototypes[0];
+
+                        if (prototypeGenerator.TryFitPrototype(map, prototype, entry, out Dector3 minPoint,
+                            out int rotation))
+                        {
+                            decision.type = PathDecisionType.Prototype;
+                            decision.entry = minPoint;
+                            decision.rotation = rotation;
+                            decision.prototypeIndex = mustSpawnPrototypes.IndexOf(prototype);
+                            return decision;
+                        }
+                    }
+                    else
+                    {
+                        /*
+                         * next corridor will skip offset anyway
+                         */
+
+                        /*
+                         * boy next corridor
+                         */
+
+                        /*
+                         * i don't remember what exactly i wanted to do here,
+                         * for now i'll just leave it
+                         */
+
+                        /*
+                        int minCorridorLength = config.MinimumCorridorsLengths[0];
+                        foreach (var corridorLength in config.MinimumCorridorsLengths)
+                        {
+                            if (minCorridorLength > corridorLength)
+                                minCorridorLength = corridorLength;
+                        }
+    
+                        int nextPathLength = currentPathLength + minCorridorLength;
+                        float nextPathProgress = nextPathLength / ((config.minimumPathLength + config.maximumPathLength) * 0.5f);
+                        float nextPrototypeProgress = (float) (mustSpawnPrototypes.Count - currentMustSpawnPrototypes.Count) /
+                                                  mustSpawnPrototypes.Count;*/
+                    }
                 }
             }
-            /*
-             * TODO: make decision
-             */
-            throw new NotImplementedException();
+            
+
+            return decision;
         }
 
         private bool TryEvaluateDecision(PathDecision decision)
@@ -128,7 +203,7 @@ namespace Level.Generation.PathLayer.Path
             {
                 float multiplier = configPathLength * config.MaximumCorridorsLengths[i] *
                                    pathDirectionsWeightsNormalized[i];
-                corridorsSizes += Dector3.Directions[i] * (int) Math.Round(multiplier * safetyMultiplier + 0.4f);
+                corridorsSizes += Dector3.Directions[i] * (short) Math.Round(multiplier * safetyMultiplier + 0.4f);
             }
 
 
@@ -145,6 +220,9 @@ namespace Level.Generation.PathLayer.Path
 
             corridorGenerator = new CorridorGenerator(config);
             roomGenerator = new RoomGenerator(config);
+            prototypeGenerator = new PrototypeGenerator(config);
+
+            map = new PathMap(GetMapSize());
 
             currentEntries = new List<Dector3>();
         }

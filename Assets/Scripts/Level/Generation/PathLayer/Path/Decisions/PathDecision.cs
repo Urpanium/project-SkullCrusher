@@ -5,26 +5,9 @@ namespace Level.Generation.PathLayer.Path.Decisions
 {
     public class PathDecision
     {
-        public long id;
-        /*
-         * which must be included in id:
-         * type - 4 bytes
-         *
-         * direction - 12 bytes
-         * length - 4 bytes
-         * width - 4 bytes
-         * height - 4 bytes
-         *
-         * prototypeId - 4 bytes
-         * rotation - 4 bytes
-         *
-         * Total size: 36 bytes
-         * But max size is: 4 + 12 + 12
-         */
-
         public PathDecisionType type;
         
-        public Dector3 point;
+        public Dector3 entry;
 
         /*
          * only used by corridor
@@ -43,10 +26,9 @@ namespace Level.Generation.PathLayer.Path.Decisions
          */
 
         /*
-         * using prototype id to make size of this class static
+         * if prototypeIndex is greater than MustSpawnPrototypes.Count, then it's from CanSpawnPrototypes
          */
-
-        public int prototypeId;
+        public int prototypeIndex;
 
         public int rotation;
 

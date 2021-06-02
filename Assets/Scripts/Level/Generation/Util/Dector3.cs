@@ -8,6 +8,7 @@ namespace Level.Generation.Util
     public class Dector3
     {
         // Discrete Vector3
+        
         public int x;
         public int y;
         public int z;

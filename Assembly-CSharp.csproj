@@ -58,6 +58,7 @@
      <Compile Include="Assets\Scripts\Level\Generation\PathLayer\Path\PathGeneratorConfig.cs" />
      <Compile Include="Assets\Scripts\AI\AiPatrolPointSet.cs" />
      <Compile Include="Assets\Scripts\Character\Controller.cs" />
+     <Compile Include="Assets\Scripts\Level\Generation\PathLayer\Path\SubGenerators\PrototypeGenerator.cs" />
      <Compile Include="Assets\Scripts\Weapons\WeaponParameters.cs" />
      <Compile Include="Assets\Scripts\PostProcessing\ImageEffect.cs" />
      <Compile Include="Assets\Scripts\Util\Gravity.cs" />
