@@ -28,7 +28,7 @@ namespace Level.Generation.PathLayer.Path.Structures
 
         public bool IsInside(Dector3 entry, bool strict = true)
         {
-            Dector3 from = entry;
+            Dector3 from = position;
             Dector3 to = To();
             if (strict)
             {
@@ -57,6 +57,12 @@ namespace Level.Generation.PathLayer.Path.Structures
         public Dector3 To()
         {
             return position + size;
+        }
+
+        public override string ToString()
+        {
+            Dector3 to = To();
+            return $"C ({position.x} {position.y} {position.z}) to ({to.x} {to.y} {to.z})";
         }
     }
 }

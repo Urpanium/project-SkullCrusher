@@ -21,17 +21,23 @@ namespace Level.Generation.Util
         public const int BackIndex = 4;
         public const int RightIndex = 5;
 
-        public static Dector3 Zero => new Dector3();
-        public static Dector3 Up => new Dector3(0, 1, 0);
-        public static Dector3 Down => new Dector3(0, -1, 0);
-        public static Dector3 Forward => new Dector3(0, 0, 1);
-        public static Dector3 Left => new Dector3(-1, 0, 0);
-        public static Dector3 Back => new Dector3(0, 0, -1);
-        public static Dector3 Right => new Dector3(1, 0, 0);
+        private static readonly Dector3 ZeroDector = new Dector3();
+        private static readonly Dector3 UpDector = new Dector3(0, 1, 0);
+        private static readonly Dector3 DownDector = new Dector3(0, -1, 0);
+        private static readonly Dector3 ForwardDector = new Dector3(0, 0, 1);
+        private static readonly Dector3 LeftDector = new Dector3(-1, 0, 0);
+        private static readonly Dector3 BackDector = new Dector3(0, 0, -1);
+        private static readonly Dector3 RightDector = new Dector3(1, 0, 0);
 
-        public static Dector3[] Directions => _directions;
+        public static Dector3 Zero => ZeroDector;
+        public static Dector3 Up => UpDector;
+        public static Dector3 Down => DownDector;
+        public static Dector3 Forward => ForwardDector;
+        public static Dector3 Left => LeftDector;
+        public static Dector3 Back => BackDector;
+        public static Dector3 Right => RightDector;
 
-        private static Dector3[] _directions =
+        public static readonly Dector3[] Directions =
         {
             Up,
             Down,
@@ -43,6 +49,13 @@ namespace Level.Generation.Util
 
         public Dector3()
         {
+        }
+
+        public Dector3(Dector3 d)
+        {
+            x = d.x;
+            y = d.y;
+            z = d.z;
         }
 
         public Dector3(int x, int y, int z)
@@ -110,12 +123,21 @@ namespace Level.Generation.Util
         public Dector3 ToOne()
         {
             Dector3 result = new Dector3();
-            if (x != 0)
-                result.x = x / Math.Abs(x);
-            if (y != 0)
-                result.y = y / Math.Abs(y);
-            if (z != 0)
-                result.z = z / Math.Abs(z);
+            if (x > 0)
+                result.x = 1;
+            if (x < 0)
+                result.x = -1;
+
+            if (y > 0)
+                result.y = 1;
+            if (y < 0)
+                result.y = -1;
+
+            if (z > 0)
+                result.z = 1;
+            if (z < 0)
+                result.z = -1;
+
             return result;
         }
 
@@ -125,20 +147,87 @@ namespace Level.Generation.Util
             return Math.Max(delta.x, Math.Max(delta.y, delta.z));
         }
 
+        /*public static Dector3[] Directions()
+        {
+            return new[]
+            {
+                Up,
+                Down,
+                Forward,
+                Left,
+                Back,
+                Right
+            };
+        }*/
+
         public static Dector3 GetDirection(int index)
         {
-            return _directions[index];
+            return Directions[index].ToOne();
         }
+
 
         public static int GetDirectionIndex(Dector3 direction)
         {
-            for (int i = 0; i < _directions.Length; i++)
+            // это были степени отчаяния и безумия, ага
+
+            /*if (direction.Equals(new Dector3(0, 1, 0)))
+                return 0;
+            if (direction.Equals(new Dector3(0, -1, 0)))
+                return 1;
+            if (direction.Equals(new Dector3(0, 0, 1)))
+                return 2;
+            if (direction.Equals(new Dector3(-1, 0, 0)))
+                return 3;
+            if (direction.Equals(new Dector3(0, 0, -1)))
+                return 4;
+            if (direction.Equals(new Dector3(1, 0, 0)))
+                return 5;
+            return -1;*/
+
+            /*if (direction.Equals(Up))
+                return 0;
+            if (direction.Equals(Down))
+                return 1;
+            if (direction.Equals(Forward))
+                return 2;
+            if (direction.Equals(Left))
+                return 3;
+            if (direction.Equals(Back))
+                return 4;
+            if (direction.Equals(Right))
+                return 5;
+            return -1;*/
+
+            //UnityEngine.Debug.Log($"GDI: got {direction}");
+            for (int i = 0; i < Directions.Length; i++)
             {
-                if (_directions[i].Equals(direction))
+                Dector3 d = Directions[i];
+                //UnityEngine.Debug.Log($"GDI: checking {d} (index {i})");
+                if (
+                    direction.x == d.x
+                    && direction.y == d.y
+                    && direction.z == d.z
+                )
+                {
+                    //UnityEngine.Debug.Log($"GDI: returning {i}");
+                    return i;
+                }
+
+                if (direction.Equals(Directions[i]))
                     return i;
             }
 
+            //UnityEngine.Debug.Log($"GDI: returning -1");
             return -1;
+        }
+
+        public static void DirCheck()
+        {
+            UnityEngine.Debug.Log("DIRECTION CHECK: ");
+            foreach (Dector3 direction in Directions)
+            {
+                UnityEngine.Debug.Log($"{direction} V = {(Vector3) direction}");
+            }
         }
 
         public static Dector3 MultiplyCorrespondingAxis(Dector3 d1, Dector3 d2)
@@ -205,7 +294,11 @@ namespace Level.Generation.Util
 
         public static Dector3 operator -(Dector3 d1, Dector3 d2)
         {
-            return d1 + d2 * -1;
+            return new Dector3(
+                d1.x - d2.x,
+                d1.y - d2.y,
+                d1.z - d2.z
+            );
         }
 
         public static Dector3 operator *(Dector3 dector3, int multiplier)
@@ -221,7 +314,12 @@ namespace Level.Generation.Util
             return new Dector3(d.x / i, d.y / i, d.z / i);
         }
 
-        
+        public static implicit operator Vector3(Dector3 d)
+        {
+            return new Vector3(d.x, d.y, d.z);
+        }
+
+
         public override bool Equals(object obj)
         {
             if (obj == null || GetType() != obj.GetType())
@@ -251,7 +349,7 @@ namespace Level.Generation.Util
 
         public override string ToString()
         {
-            return $"D({x}, {y}, {z})";
+            return $"D ({x}, {y}, {z})";
         }
     }
 }

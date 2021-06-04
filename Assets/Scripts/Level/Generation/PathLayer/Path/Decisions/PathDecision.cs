@@ -23,9 +23,30 @@ namespace Level.Generation.PathLayer.Path.Decisions
         /*
          * if prototypeIndex is greater than MustSpawnPrototypes.Count, then it's from CanSpawnPrototypes
          */
-        public int prototypeIndex;
+        public int prototypeId;
 
         public int rotation;
 
+        public override string ToString()
+        {
+            switch (type)
+            {
+                case PathDecisionType.Corridor:
+                {
+                    return $"Corridor from {entry} to {to}, size: {size}";
+                }
+                case PathDecisionType.End:
+                {
+                    return "End signal";
+                }
+                case PathDecisionType.Prototype:
+                {
+                    return $"Prototype ({prototypeId}) rotation {rotation} at point {entry}";
+                }
+                    
+            }
+
+            return "";
+        }
     }
 }

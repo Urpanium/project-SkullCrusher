@@ -1,4 +1,5 @@
 ﻿using System;
+using Level.Generation.PathLayer.Path.Map;
 using Level.Generation.PathLayer.Path.Prototypes;
 using Level.Generation.PathLayer.Path.Structures;
 using Level.Generation.Util;
@@ -10,7 +11,7 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
      */
     public class PrototypeGenerator : SubGenerator
     {
-        public PrototypeGenerator(PathGeneratorConfig config) : base(config)
+        public PrototypeGenerator(PathGenerationConfig config) : base(config)
         {
         }
 

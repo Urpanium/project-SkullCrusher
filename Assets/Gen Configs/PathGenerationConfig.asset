@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99da320bcf6e417398a5212b6bd1abfe, type: 3}
+  m_Name: PathGenerationConfig
+  m_EditorClassIdentifier: 
+  seed: 0
+  perEntryDecisionsLimit: 5
+  mapSizeSafetyMultiplier: 1
+  minimumPathLength: 50
+  maximumPathLength: 100
+  maximumEndPointCorridorLength: 50
+  minimumPathContinueChance: 0.5
+  minimumOffsetBetweenMustSpawnPrototypes: 5
+  minimumOffsetBetweenCanSpawnPrototypes: 3
+  pathTopDirectionWeight: 1
+  pathBottomDirectionWeight: 1
+  pathForwardDirectionWeight: 5
+  pathLeftDirectionWeight: 1
+  pathBackDirectionWeight: 1
+  pathRightDirectionWeight: 1
+  minimumTopCorridorLength: 3
+  maximumTopCorridorLength: 6
+  maximumTopCorridorWidth: 3
+  maximumTopCorridorHeight: 3
+  minimumBottomCorridorLength: 3
+  maximumBottomCorridorLength: 6
+  maximumBottomCorridorWidth: 3
+  maximumBottomCorridorHeight: 3
+  minimumForwardCorridorLength: 3
+  maximumForwardCorridorLength: 6
+  maximumForwardCorridorWidth: 3
+  maximumForwardCorridorHeight: 3
+  minimumLeftCorridorLength: 3
+  maximumLeftCorridorLength: 6
+  maximumLeftCorridorWidth: 3
+  maximumLeftCorridorHeight: 3
+  minimumBackCorridorLength: 3
+  maximumBackCorridorLength: 6
+  maximumBackCorridorWidth: 3
+  maximumBackCorridorHeight: 3
+  minimumRightCorridorLength: 3
+  maximumRightCorridorLength: 6
+  maximumRightCorridorWidth: 3
+  maximumRightCorridorHeight: 3
+  minimumRoomXSize: 2
+  minimumRoomYSize: 2
+  minimumRoomZSize: 2
+  maximumRoomXSize: 4
+  maximumRoomYSize: 4
+  maximumRoomZSize: 4

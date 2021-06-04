@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Level.Gen.Util;
-using Level.Gen.VisualLayer;
 using Level.Generation.Util;
 using UnityEditor;
 using UnityEngine;
@@ -31,11 +29,11 @@ namespace Level.GenScripts
             }
         }
 
-        public Prototype GetPrototype()
+        /*public Prototype GetPrototype()
         {
             Prototype prototype = new Prototype(gameObject.name, sockets, socketsPositions, size);
             return prototype;
-        }
+        }*/
 
 
         private void OnDrawGizmos()
