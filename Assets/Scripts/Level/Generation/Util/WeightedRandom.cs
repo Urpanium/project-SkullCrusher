@@ -12,15 +12,15 @@ namespace Level.Generation.Util
             random = new Random(seed);
         }
 
-        public List<object> RandomizeList(List<object> objects, List<double> weights)
+        public List<T> RandomWeightedList<T>(List<T> objects, List<float> weights)
         {
-            List<object> result = new List<object>();
+            List<T> result = new List<T>();
             for (int i = 0; i < weights.Count; i++)
             {
-                int index = RandomIndex(weights);
-                object item = objects[index];
+                int index = RandomWeightedIndex(weights);
+                T item = objects[index];
                 result.Add(item);
-                
+
                 objects.RemoveAt(index);
                 weights.RemoveAt(index);
             }
@@ -29,15 +29,15 @@ namespace Level.Generation.Util
         }
 
 
-        public int RandomIndex(List<double> weights)
+        public int RandomWeightedIndex(List<float> weights)
         {
-            double max = 0.0;
-            foreach (double weight in weights)
+            float max = 0.0f;
+            foreach (float weight in weights)
             {
                 max += weight;
             }
 
-            double randomValue = random.NextDouble() * max;
+            float randomValue = (float) random.NextDouble() * max;
 
             for (int i = 0; i < weights.Count; i++)
             {

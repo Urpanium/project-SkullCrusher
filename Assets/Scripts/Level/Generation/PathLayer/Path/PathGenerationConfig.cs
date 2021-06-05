@@ -1,4 +1,5 @@
 ﻿using System;
+using Level.Generation.Util;
 using UnityEngine;
 
 namespace Level.Generation.PathLayer.Path
@@ -187,5 +188,9 @@ namespace Level.Generation.PathLayer.Path
         public int maximumRoomXSize;
         public int maximumRoomYSize;
         public int maximumRoomZSize;
+
+
+        public Dector3 minRoomSize => new Dector3(minimumRoomXSize, minimumRoomYSize, minimumRoomZSize);
+        public Dector3 maxRoomSize => new Dector3(maximumRoomXSize, maximumRoomYSize, maximumRoomZSize);
     }
 }

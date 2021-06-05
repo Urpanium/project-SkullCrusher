@@ -14,7 +14,7 @@
 
         // степень сжатия по шкале ебучих шакалов
         _ArtifactIntensity ("Artifacts Intensity", Range(0, 1)) = 0.5
-        _PixelizationIntensity ("Pixelization Intensity", Range(0,1)) = 0.2
+        _PixelizationIntensity ("Pixelization Intensity", Range(0, 1)) = 0.2
 
         _Depth ("Blend Smoothness", Range(0.001, 1)) = 0.015
     }

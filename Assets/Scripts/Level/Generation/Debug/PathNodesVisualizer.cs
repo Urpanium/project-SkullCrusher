@@ -56,7 +56,6 @@ namespace Level.Generation.Debug
         {
             if (map == null)
                 return;
-            Color[] colors = {Color.black, Color.blue, Color.cyan, Color.white, Color.yellow, Color.red, Color.magenta};
             Gizmos.color = Color.blue;
             for (int x = map.minBound.x; x <= map.maxBound.x; x++)
             {
@@ -71,15 +70,20 @@ namespace Level.Generation.Debug
                             if (!map.IsTileEmpty(dPosition))
                             {
                                 PathTile tile = PathTile.FromByte(byteTile);
-                                int colorIndex = 0;
+                                int connections = 0;
                                 for (int i = 0; i < Dector3.Directions.Length; i++)
                                 {
                                     if (tile.GetDirectionAccess(i))
                                     {
-                                        colorIndex++;
+                                        connections++;
                                     }
                                 }
-                                Gizmos.color = colors[colorIndex];
+
+                                Gizmos.color = new Color(
+                                    (connections - 1) / 5.0f,
+                                    (connections - 3) / 3.0f,
+                                    (connections - 5) / 1.0f
+                                    );
                                 
                                 Vector3 position = ((Vector3) dPosition - (Vector3)map.size * 0.5f) * step;
                                 Gizmos.DrawCube(position, Vector3.one);

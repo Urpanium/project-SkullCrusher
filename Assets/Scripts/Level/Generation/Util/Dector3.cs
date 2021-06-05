@@ -37,14 +37,24 @@ namespace Level.Generation.Util
         public static Dector3 Back => BackDector;
         public static Dector3 Right => RightDector;
 
-        public static readonly Dector3[] Directions =
+        public static Dector3[] Directions => _directions;
+
+        private static readonly Dector3[] _directions =
         {
-            Up,
-            Down,
-            Forward,
-            Left,
-            Back,
-            Right
+            new Dector3(0, 1, 0),
+            new Dector3(0, -1, 0),
+            new Dector3(0, 0, 1),
+            new Dector3(-1, 0, 0),
+            new Dector3(0, 0, -1),
+            new Dector3(1, 0, 0)
+            /*
+             * Up,
+             * Down,
+             * Forward,
+             * Left,
+             * Back,
+             * Right
+             */
         };
 
         public Dector3()
@@ -201,7 +211,7 @@ namespace Level.Generation.Util
             //UnityEngine.Debug.Log($"GDI: got {direction}");
             for (int i = 0; i < Directions.Length; i++)
             {
-                Dector3 d = Directions[i];
+                Dector3 d = GetDirection(i);
                 //UnityEngine.Debug.Log($"GDI: checking {d} (index {i})");
                 if (
                     direction.x == d.x
@@ -223,12 +233,13 @@ namespace Level.Generation.Util
 
         public static void DirCheck()
         {
-            UnityEngine.Debug.Log("DIRECTION CHECK: ");
+            UnityEngine.Debug.Log("DIRECTION CHECK:");
             foreach (Dector3 direction in Directions)
             {
-                UnityEngine.Debug.Log($"{direction} V = {(Vector3) direction}");
+                UnityEngine.Debug.Log($"{direction}");
             }
         }
+
 
         public static Dector3 MultiplyCorrespondingAxis(Dector3 d1, Dector3 d2)
         {

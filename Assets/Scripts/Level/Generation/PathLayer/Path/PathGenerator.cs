@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Level.Generation.PathLayer.Path.Decisions;
 using Level.Generation.PathLayer.Path.Map;
 using Level.Generation.PathLayer.Path.Prototypes;
 using Level.Generation.PathLayer.Path.Snapshots;
 using Level.Generation.PathLayer.Path.Structures;
+using Level.Generation.PathLayer.Path.SubGenerators;
 using Level.Generation.Util;
 
 namespace Level.Generation.PathLayer.Path
@@ -20,6 +22,8 @@ namespace Level.Generation.PathLayer.Path
 
         private PathSnapshot currentSnapshot;
 
+        private bool debugMode = false;
+
         public PathGenerator(PathGenerationConfig config, List<PathPrototype> mustSpawnPrototypes,
             List<PathPrototype> canSpawnPrototypes)
         {
@@ -27,9 +31,12 @@ namespace Level.Generation.PathLayer.Path
                 mustSpawnPrototypes = new List<PathPrototype>();
             if (canSpawnPrototypes == null)
                 canSpawnPrototypes = new List<PathPrototype>();
+
             this.mustSpawnPrototypes = mustSpawnPrototypes;
             this.canSpawnPrototypes = canSpawnPrototypes;
             this.config = config;
+
+            debugMode = mustSpawnPrototypes.Count < 2;
 
             currentSnapshot =
                 PathSnapshot.Start(config, GetMapSize(), mustSpawnPrototypes.Count, canSpawnPrototypes.Count);
@@ -37,12 +44,60 @@ namespace Level.Generation.PathLayer.Path
 
         public PathMap Generate()
         {
-            Dector3 center = currentSnapshot.map.size / 2;
-            BuildCuboid(Cuboid.FromPoints(center + new Dector3(-2, -2, -2), center/* + new Dector3(1, 1, 1)*/),
-                new List<Dector3>());
+            try
+            {
+                PathDecision decision = StartDecision();
+                EvaluateDecision(decision);
+            }
+            catch(Exception e)
+            {
+                UnityEngine.Debug.LogError(e);
+            }
+
             Dector3.DirCheck();
             return currentSnapshot.map;
         }
+
+        private bool EvaluateDecision(PathDecision decision)
+        {
+            UnityEngine.Debug.Log($"DECISION: {decision}");
+            if (decision.type == PathDecisionType.Corridor)
+            {
+                BuildCuboid(Cuboid.FromPosition(decision.entry, decision.size),
+                    decision.newEntries, false, true);
+            }
+            
+
+            return false;
+        }
+
+        private PathDecision StartDecision()
+        {
+            PathDecision decision = new PathDecision();
+            Dector3 startEntry = currentSnapshot.map.size / 2;
+            if (debugMode)
+            {
+                UnityEngine.Debug.Log($"Center: {startEntry}");
+                Cuboid corridor =
+                    currentSnapshot.corridorGenerator.Generate(currentSnapshot.map, startEntry, out var newEntry);
+                decision.type = PathDecisionType.Corridor;
+
+                decision.entry = corridor.position;
+                decision.to = newEntry;
+                decision.size = corridor.size;
+                
+                decision.newEntries = new List<Dector3> {newEntry};
+            }
+            else
+            {
+                /*
+                 * TODO: make normal start
+                 */
+            }
+
+            return decision;
+        }
+
 
         public void Reset()
         {
@@ -60,7 +115,6 @@ namespace Level.Generation.PathLayer.Path
 
             Dector3 from = cuboid.position;
             Dector3 to = cuboid.To();
-            //UnityEngine.Debug.Log($"FROM {from} to {to}");
             for (int x = from.x; x <= to.x; x++)
             {
                 for (int y = from.y; y <= to.y; y++)
@@ -68,40 +122,34 @@ namespace Level.Generation.PathLayer.Path
                     for (int z = from.z; z <= to.z; z++)
                     {
                         Dector3 position = new Dector3(x, y, z);
-                        
+
                         PathTile pathTile = new PathTile();
-                        UnityEngine.Debug.Log($"Checking position {position}");
-                        if (cuboid.IsInside(position) || entries.Contains(position))
+                        
+                        if (cuboid.IsInside(position))
                         {
-                            UnityEngine.Debug.Log("Any dir allowed");
                             pathTile.AllowGoToAnyDirection();
                             pathTile.Changeable = changeable;
                         }
                         else
                         {
-                            
                             for (int i = 0; i < Dector3.Directions.Length; i++)
                             {
-
                                 Dector3 direction = Dector3.GetDirection(i);
                                 Dector3 nearPosition = position + direction;
-                                
-                                UnityEngine.Debug.Log($"Direction {direction}, near position {nearPosition}");
+
 
                                 bool isValid = map.IsPositionValid(nearPosition);
                                 bool isInside = cuboid.IsInside(nearPosition, false);
-                                
-                                
+
+
                                 bool access = isValid && isInside;
-                                UnityEngine.Debug.Log($"isValid: {isValid}; isInside: {isInside}; , access: {access}");
-                                
+
                                 pathTile.SetDirectionAccess(Dector3.GetDirectionIndex(direction),
                                     access);
                             }
 
-                            //UnityEngine.Debug.Log("SET");
-                            
                         }
+
                         map.SetTile(position, pathTile);
                     }
                 }

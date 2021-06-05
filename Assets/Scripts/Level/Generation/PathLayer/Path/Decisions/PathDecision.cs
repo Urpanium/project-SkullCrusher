@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Level.Generation.Util;
 
 namespace Level.Generation.PathLayer.Path.Decisions
@@ -9,11 +10,17 @@ namespace Level.Generation.PathLayer.Path.Decisions
         
         public Dector3 entry;
 
+        public List<Dector3> newEntries;
+
         /*
-         * only used by corridor
+         * used by corridor and room
          */
 
         public Dector3 size;
+        
+        /*
+         * corridor only
+         */
         public Dector3 to;
 
         /*
@@ -37,11 +44,15 @@ namespace Level.Generation.PathLayer.Path.Decisions
                 }
                 case PathDecisionType.End:
                 {
-                    return "End signal";
+                    return "Ending decision";
                 }
                 case PathDecisionType.Prototype:
                 {
                     return $"Prototype ({prototypeId}) rotation {rotation} at point {entry}";
+                }
+                case PathDecisionType.Room:
+                {
+                    return $"Room form {entry} to {size}";
                 }
                     
             }
