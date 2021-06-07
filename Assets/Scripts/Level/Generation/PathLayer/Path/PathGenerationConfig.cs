@@ -18,9 +18,8 @@ namespace Level.Generation.PathLayer.Path
          */
 
         public int perEntryDecisionsLimit;
-        
-        [Range(0.01f, 10)]
-        public float mapSizeSafetyMultiplier;
+
+        [Range(0.01f, 10)] public float mapSizeSafetyMultiplier;
 
         /*
          * path length parameters
@@ -43,6 +42,8 @@ namespace Level.Generation.PathLayer.Path
         public float minimumPathContinueChance;
 
         public int minimumOffsetBetweenMustSpawnPrototypes;
+
+        [Range(0, 1)] public float mustSpawnPrototypeRate;
 
         public int minimumOffsetBetweenCanSpawnPrototypes;
 
@@ -181,7 +182,8 @@ namespace Level.Generation.PathLayer.Path
             }
         }
 
-        [Header("Rooms")] public int minimumRoomXSize;
+        [Header("Rooms")]
+        public int minimumRoomXSize;
         public int minimumRoomYSize;
         public int minimumRoomZSize;
 
@@ -189,8 +191,12 @@ namespace Level.Generation.PathLayer.Path
         public int maximumRoomYSize;
         public int maximumRoomZSize;
 
+        public int minimumRoomEntriesCount;
+        public int maximumRoomEntriesCount;
+        
 
-        public Dector3 minRoomSize => new Dector3(minimumRoomXSize, minimumRoomYSize, minimumRoomZSize);
-        public Dector3 maxRoomSize => new Dector3(maximumRoomXSize, maximumRoomYSize, maximumRoomZSize);
+
+        public Dector3 minimumRoomSize => new Dector3(minimumRoomXSize, minimumRoomYSize, minimumRoomZSize);
+        public Dector3 maximumRoomSize => new Dector3(maximumRoomXSize, maximumRoomYSize, maximumRoomZSize);
     }
 }

@@ -125,14 +125,10 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
             {
                 throw new Exception("Even width or/and height are not allowed");
             }
-            UnityEngine.Debug.Log($"FROM BEFORE: {from}");
-            UnityEngine.Debug.Log($"TO BEFORE: {to}");
 
             (Dector3, Dector3) minAndMax = Dector3.ToMinAndMax(from, to);
             from = minAndMax.Item1;
             to = minAndMax.Item2;
-            UnityEngine.Debug.Log($"FROM AFTER: {from}");
-            UnityEngine.Debug.Log($"TO AFTER: {to}");
 
             Dector3 direction = (to - from).ToOne();
 
@@ -176,7 +172,7 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
             Dector3 cuboidTo = to
                              - up * halfHeight
                              - right * halfWidth;
-            UnityEngine.Debug.Log($"Cuboid: from = {from} + {up} * {halfHeight} + {right} * {halfWidth}; to {from} - {up} * {halfHeight} - {right} * {halfWidth}");
+            
             return Cuboid.FromPoints(cuboidFrom, cuboidTo);
         }
 

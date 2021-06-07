@@ -17,7 +17,7 @@ namespace Level.Generation.PathLayer.Path.Prototypes
         {
             this.size = size;
             this.entries = entries.ToList();
-            if (GetSurfaceSquare() < this.entries.Count)
+            if (GetSurfaceTilesCount() < this.entries.Count)
             {
                 throw new Exception($"Too many entries received: {this.entries.Count}");
             }
@@ -36,13 +36,12 @@ namespace Level.Generation.PathLayer.Path.Prototypes
         }
 
 
-        private int GetSurfaceSquare()
+        private int GetSurfaceTilesCount()
         {
-            int xFaces = size.z * size.y * 2;
-            int yFaces = size.x * size.z * 2;
-            int zFaces = size.y * size.x * 2;
+            int fullVolume = size.x * size.y * size.z;
+            int innerVolume = (size.x - 2) * (size.y - 2) * (size.z - 2);
 
-            return xFaces + yFaces + zFaces;
+            return fullVolume - innerVolume;
         }
     }
 }

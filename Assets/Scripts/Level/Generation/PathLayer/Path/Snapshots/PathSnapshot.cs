@@ -16,6 +16,8 @@ namespace Level.Generation.PathLayer.Path.Snapshots
 
         public Random random;
         public WeightedRandom weightedRandom;
+
+        public int currentPathLength;
         
         public CorridorGenerator corridorGenerator;
         public RoomGenerator roomGenerator;
@@ -26,7 +28,8 @@ namespace Level.Generation.PathLayer.Path.Snapshots
 
         public int canSpawnPrototypesRemain;
         public int currentCanSpawnOffset;
-        
+
+        public List<Dector3> allEntries;
         public List<Dector3> currentEntries;
         
         public int restores;
@@ -49,6 +52,7 @@ namespace Level.Generation.PathLayer.Path.Snapshots
                 map = new PathMap(mapSize),
                 decision = null,
                 random = new Random(),
+                currentPathLength = 0,
                 corridorGenerator = new CorridorGenerator(config),
                 roomGenerator = new RoomGenerator(config),
                 prototypeGenerator = new PrototypeGenerator(config),
@@ -56,6 +60,7 @@ namespace Level.Generation.PathLayer.Path.Snapshots
                 currentMustSpawnOffset = 0,
                 canSpawnPrototypesRemain = canSpawnPrototypesCount,
                 currentCanSpawnOffset = 0,
+                allEntries = new List<Dector3>(),
                 currentEntries = new List<Dector3>(),
                 restores = 0
             };

@@ -20,10 +20,11 @@ MonoBehaviour:
   maximumEndPointCorridorLength: 50
   minimumPathContinueChance: 0.5
   minimumOffsetBetweenMustSpawnPrototypes: 5
+  mustSpawnPrototypeRate: 0
   minimumOffsetBetweenCanSpawnPrototypes: 3
   pathTopDirectionWeight: 1
   pathBottomDirectionWeight: 1
-  pathForwardDirectionWeight: 5
+  pathForwardDirectionWeight: 1
   pathLeftDirectionWeight: 1
   pathBackDirectionWeight: 1
   pathRightDirectionWeight: 1

@@ -49,7 +49,7 @@ namespace Level.Generation.PathLayer.Path
                 PathDecision decision = StartDecision();
                 EvaluateDecision(decision);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 UnityEngine.Debug.LogError(e);
             }
@@ -58,15 +58,57 @@ namespace Level.Generation.PathLayer.Path
             return currentSnapshot.map;
         }
 
+        private PathDecision GenerateDecision(int tryNumber = 0)
+        {
+            /*
+             * basing on a try number, try make a different decisions
+             */
+            PathDecision decision = new PathDecision();
+            if (IsItTimeToSpawnAFuckingMustSpawnPrototype())
+            {
+                
+            }
+            return decision;
+        }
+
+        private bool IsItTimeToSpawnAFuckingMustSpawnPrototype()
+        {
+            bool can = currentSnapshot.currentMustSpawnOffset > config.minimumOffsetBetweenMustSpawnPrototypes;
+            if (!can)
+                return false;
+
+            float configMaximumSpawnRate = (float) mustSpawnPrototypes.Count / config.minimumPathLength;
+            float pathSpawnRate = (float) (mustSpawnPrototypes.Count - currentSnapshot.canSpawnPrototypesRemain) /
+                                  currentSnapshot.currentPathLength;
+            
+            if (pathSpawnRate < configMaximumSpawnRate)
+            {
+                return true;
+            }
+
+            /*
+             * let the random decide
+             */
+            float value = (float) currentSnapshot.random.NextDouble();
+            return value < config.mustSpawnPrototypeRate;
+        }
+
+
         private bool EvaluateDecision(PathDecision decision)
         {
             UnityEngine.Debug.Log($"DECISION: {decision}");
-            if (decision.type == PathDecisionType.Corridor)
+
+            if (decision.type == PathDecisionType.Room
+                || decision.type == PathDecisionType.Corridor)
             {
-                BuildCuboid(Cuboid.FromPosition(decision.entry, decision.size),
-                    decision.newEntries, false, true);
+                Cuboid cuboid = Cuboid.FromPosition(decision.entry, decision.size);
+                if (CanFitCuboid(currentSnapshot.map, cuboid))
+                {
+                    BuildCuboid(cuboid, decision.newEntries, false, true);
+                    return true;
+                }
             }
-            
+
 
             return false;
         }
@@ -77,7 +119,6 @@ namespace Level.Generation.PathLayer.Path
             Dector3 startEntry = currentSnapshot.map.size / 2;
             if (debugMode)
             {
-                UnityEngine.Debug.Log($"Center: {startEntry}");
                 Cuboid corridor =
                     currentSnapshot.corridorGenerator.Generate(currentSnapshot.map, startEntry, out var newEntry);
                 decision.type = PathDecisionType.Corridor;
@@ -85,7 +126,7 @@ namespace Level.Generation.PathLayer.Path
                 decision.entry = corridor.position;
                 decision.to = newEntry;
                 decision.size = corridor.size;
-                
+
                 decision.newEntries = new List<Dector3> {newEntry};
             }
             else
@@ -124,7 +165,7 @@ namespace Level.Generation.PathLayer.Path
                         Dector3 position = new Dector3(x, y, z);
 
                         PathTile pathTile = new PathTile();
-                        
+
                         if (cuboid.IsInside(position))
                         {
                             pathTile.AllowGoToAnyDirection();
@@ -147,7 +188,6 @@ namespace Level.Generation.PathLayer.Path
                                 pathTile.SetDirectionAccess(Dector3.GetDirectionIndex(direction),
                                     access);
                             }
-
                         }
 
                         map.SetTile(position, pathTile);
@@ -159,6 +199,38 @@ namespace Level.Generation.PathLayer.Path
         public void BuildPrototype(PathPrototype prototype)
         {
             PathMap map = currentSnapshot.map;
+        }
+
+        private bool CanFitCuboid(PathMap map, Cuboid cuboid)
+        {
+            Dector3 from = cuboid.position;
+            Dector3 to = cuboid.To();
+
+            if (
+                !map.IsPositionValid(from) ||
+                !map.IsPositionValid(to))
+            {
+                UnityEngine.Debug.Log($"Can't fit because of invalid point(s): {cuboid} (mapSize: {map.size})");
+                return false;
+            }
+
+
+            for (int x = from.x; x < to.x; x++)
+            {
+                for (int y = from.y; y < to.y; y++)
+                {
+                    for (int z = from.z; z < to.z; z++)
+                    {
+                        if (!map.IsTileEmpty(x, y, z))
+                        {
+                            UnityEngine.Debug.Log("Cant fit because of non empty tiles");
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
 
 

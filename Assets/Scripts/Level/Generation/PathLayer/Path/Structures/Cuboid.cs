@@ -1,4 +1,7 @@
-﻿using Level.Generation.Util;
+﻿using System;
+using System.Collections.Generic;
+using Level.Generation.Util;
+using NUnit.Framework;
 
 namespace Level.Generation.PathLayer.Path.Structures
 {
@@ -33,14 +36,15 @@ namespace Level.Generation.PathLayer.Path.Structures
             if (strict)
             {
                 return entry.x > from.x && entry.x < to.x
-                                           && entry.y > from.y && entry.y < to.y
-                                           && entry.z > from.z && entry.z < to.z;
+                                        && entry.y > from.y && entry.y < to.y
+                                        && entry.z > from.z && entry.z < to.z;
             }
 
             return entry.x >= from.x && entry.x <= to.x
-                                        && entry.y >= from.y && entry.y <= to.y
-                                        && entry.z >= from.z && entry.z <= to.z;
+                                     && entry.y >= from.y && entry.y <= to.y
+                                     && entry.z >= from.z && entry.z <= to.z;
         }
+
         public bool IsOnBorder(Dector3 entry)
         {
             Dector3 from = position;
@@ -52,6 +56,51 @@ namespace Level.Generation.PathLayer.Path.Structures
                 || entry.x == to.x
                 || entry.y == to.y
                 || entry.z == to.z;
+        }
+
+        public List<Dector3> GenerateRoomEntries(Random random, int count)
+        {
+            List<Dector3> allEntries = new List<Dector3>();
+            List<Dector3> result = new List<Dector3>();
+            int maxCount = GetSurfaceTilesCount();
+            if (count > maxCount)
+            {
+                throw new Exception("Entries count is too big");
+            }
+
+
+            for (int x = 0; x < size.x; x++)
+            {
+                for (int y = 0; y < size.y; y++)
+                {
+                    for (int z = 0; z < size.z; z++)
+                    {
+                        Dector3 point = new Dector3(x, y, z);
+                        if (IsOnBorder(point))
+                        {
+                            allEntries.Add(point);
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                int index = random.Next(allEntries.Count);
+                result.Add(allEntries[index]);
+                allEntries.RemoveAt(index);
+            }
+
+            return result;
+        }
+
+        public int GetSurfaceTilesCount()
+        {
+            // wooow, so optimized, my god
+            int fullVolume = size.x * size.y * size.z;
+            int innerVolume = (size.x - 2) * (size.y - 2) * (size.z - 2);
+
+            return fullVolume - innerVolume;
         }
 
         public Dector3 To()
