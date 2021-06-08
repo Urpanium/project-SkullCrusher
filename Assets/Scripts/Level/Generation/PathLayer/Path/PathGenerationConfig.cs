@@ -32,7 +32,7 @@ namespace Level.Generation.PathLayer.Path
         /*
          * exist because we don't want previous
          * and current level to overlap
-         */
+         */ 
         public int maximumEndPointCorridorLength;
 
         /*
@@ -40,6 +40,13 @@ namespace Level.Generation.PathLayer.Path
          */
         // TODO: remove if not used
         public float minimumPathContinueChance;
+
+        /*
+         * this weights define how often generator should try to
+         */
+        [Header("Freedom decisions")] public float prototypeWeight;
+        public float corridorWeight;
+        public float roomWeight;
 
         public int minimumOffsetBetweenMustSpawnPrototypes;
 

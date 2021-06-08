@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Level.Generation.PathLayer.Path.Decisions;
 using Level.Generation.PathLayer.Path.Map;
 using Level.Generation.PathLayer.Path.Prototypes;
@@ -44,9 +45,10 @@ namespace Level.Generation.PathLayer.Path
 
         public PathMap Generate()
         {
+            PathDecision decision = StartDecision();
             try
             {
-                PathDecision decision = StartDecision();
+                decision = StartDecision();
                 EvaluateDecision(decision);
             }
             catch (Exception e)
@@ -64,26 +66,74 @@ namespace Level.Generation.PathLayer.Path
              * basing on a try number, try make a different decisions
              */
             PathDecision decision = new PathDecision();
+
+
+            Dector3 entry = GetRandomEntry(tryNumber);
+
+
+            if (MustEndPath())
+            {
+                decision.type = PathDecisionType.End;
+
+                return decision;
+            }
+
             if (IsItTimeToSpawnAFuckingMustSpawnPrototype())
             {
-                
+                int prototypeId = mustSpawnPrototypes.Count - currentSnapshot.mustSpawnPrototypesRemain;
+                PathPrototype prototype = mustSpawnPrototypes[prototypeId];
+
+                Dector3 minPoint;
+                int rotation;
+                if (currentSnapshot.prototypeGenerator.TryFitPrototype(currentSnapshot.map, prototype, entry, out minPoint,
+                    out rotation))
+                {
+                    decision.type = PathDecisionType.Prototype;
+                    decision.prototypeId = prototypeId;
+                }
+                else
+                {
+                    /*
+                     * TODO: rollback shit, we can't build
+                     */
+                }
             }
+
             return decision;
+        }
+
+        private Dector3 GetRandomEntry(int tryNumber = 0)
+        {
+            List<Dector3> currentEntries = currentSnapshot.currentEntries;
+            Random entriesShuffleRandom = new Random(config.seed);
+
+            for (int i = 0; i < currentEntries.Count / 2; i++)
+            {
+                int index1 = entriesShuffleRandom.Next(currentEntries.Count);
+                int offset = entriesShuffleRandom.Next(currentEntries.Count - 1);
+                int index2 = (index1 + offset) % currentEntries.Count;
+                Dector3 buffer = currentEntries[index2];
+                currentEntries[index2] = currentEntries[index1];
+                currentEntries[index1] = buffer;
+            }
+
+            return currentEntries[tryNumber];
         }
 
         private bool IsItTimeToSpawnAFuckingMustSpawnPrototype()
         {
             bool can = currentSnapshot.currentMustSpawnOffset > config.minimumOffsetBetweenMustSpawnPrototypes;
+
             if (!can)
                 return false;
 
             float configMaximumSpawnRate = (float) mustSpawnPrototypes.Count / config.minimumPathLength;
             float pathSpawnRate = (float) (mustSpawnPrototypes.Count - currentSnapshot.canSpawnPrototypesRemain) /
                                   currentSnapshot.currentPathLength;
-            
+
             if (pathSpawnRate < configMaximumSpawnRate)
             {
-                return true;
+                return !CanEndPath();
             }
 
             /*
@@ -91,6 +141,29 @@ namespace Level.Generation.PathLayer.Path
              */
             float value = (float) currentSnapshot.random.NextDouble();
             return value < config.mustSpawnPrototypeRate;
+        }
+
+        private bool CanEndPath()
+        {
+            bool isLastPrototype = currentSnapshot.mustSpawnPrototypesRemain == 1;
+            bool canEnd = currentSnapshot.currentPathLength > config.minimumPathLength;
+            return isLastPrototype && canEnd;
+        }
+
+        private bool MustEndPath()
+        {
+            int minimumCorridorLength = config.MinimumCorridorsLengths[0];
+            for (int i = 1; i < config.MinimumCorridorsLengths.Length; i++)
+            {
+                int currentLength = config.MinimumCorridorsLengths[i];
+                if (minimumCorridorLength < currentLength)
+                {
+                    minimumCorridorLength = currentLength;
+                }
+            }
+
+
+            return minimumCorridorLength > config.maximumPathLength - currentSnapshot.currentPathLength;
         }
 
 
@@ -112,6 +185,7 @@ namespace Level.Generation.PathLayer.Path
 
             return false;
         }
+
 
         private PathDecision StartDecision()
         {
