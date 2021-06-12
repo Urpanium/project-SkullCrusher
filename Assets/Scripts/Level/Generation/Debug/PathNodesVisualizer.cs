@@ -22,19 +22,34 @@ namespace Level.Generation.Debug
 
         private PathGenerator generator;
 
+
+        private List<Dector3> currentEntries;
+        private List<Dector3> allEntries;
+
         private void Start()
         {
            
             generator = new PathGenerator(config, mustSpawnPrototypes, canSpawnPrototypes);
-
-            map = generator.Generate();
-            
-            //map = generator.Step(genStep++);
+            generator.Reset();
+            map = generator.GenStep();
+            currentEntries = generator.GetCurrentEntries();
+            allEntries = generator.GetAllEntries();
+            PathTile tile = new PathTile();
+            tile.SetDirectionAccess(0,true);
+            tile.SetDirectionAccess(3,true);
+            tile.Changeable = false;
+            print(tile);
+            tile = PathTile.FromByte(tile.ToByte());
+            print(tile);
+            Dector3.DirCheck();
         }
 
         public void Step()
         {
-            //map = generator.Step(genStep++);
+            map = generator.GenStep();
+            currentEntries = generator.GetCurrentEntries();
+            allEntries = generator.GetAllEntries();
+            
         }
         
 
@@ -52,7 +67,7 @@ namespace Level.Generation.Debug
             }
         }*/
 
-        private void OnDrawGizmos()
+        private void OnDrawGizmosSelected()
         {
             if (map == null)
                 return;
@@ -70,20 +85,37 @@ namespace Level.Generation.Debug
                             if (!map.IsTileEmpty(dPosition))
                             {
                                 PathTile tile = PathTile.FromByte(byteTile);
-                                int connections = 0;
-                                for (int i = 0; i < Dector3.Directions.Length; i++)
+                                
+                                if (currentEntries.Contains(dPosition))
                                 {
-                                    if (tile.GetDirectionAccess(i))
+                                    Gizmos.color = Color.green;
+                                }
+                                else
+                                {
+                                    if (allEntries.Contains(dPosition))
                                     {
-                                        connections++;
+                                        Gizmos.color = Color.blue;
+                                    }
+                                    else
+                                    {
+                                        int connections = 0;
+                                        for (int i = 0; i < Dector3.Directions.Length; i++)
+                                        {
+                                            if (tile.GetDirectionAccess(i))
+                                            {
+                                                connections++;
+                                            }
+                                        }
+
+                                        Gizmos.color = new Color(
+                                            (connections - 1) / 5.0f,
+                                            0,
+                                            0
+                                        );
                                     }
                                 }
 
-                                Gizmos.color = new Color(
-                                    (connections - 1) / 5.0f,
-                                    (connections - 3) / 3.0f,
-                                    (connections - 5) / 1.0f
-                                    );
+                                
                                 
                                 Vector3 position = ((Vector3) dPosition - (Vector3)map.size * 0.5f) * step;
                                 Gizmos.DrawCube(position, Vector3.one);

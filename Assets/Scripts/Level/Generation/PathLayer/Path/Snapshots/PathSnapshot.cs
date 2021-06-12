@@ -52,6 +52,7 @@ namespace Level.Generation.PathLayer.Path.Snapshots
                 map = new PathMap(mapSize),
                 decision = null,
                 random = new Random(),
+                weightedRandom = new WeightedRandom(config.seed),
                 currentPathLength = 0,
                 corridorGenerator = new CorridorGenerator(config),
                 roomGenerator = new RoomGenerator(config),

@@ -45,17 +45,24 @@ namespace Level.Generation.PathLayer.Path.Structures
                                      && entry.z >= from.z && entry.z <= to.z;
         }
 
-        public bool IsOnBorder(Dector3 entry)
+        private bool IsOnBorder(Dector3 entry)
         {
-            Dector3 from = position;
-            Dector3 to = To();
+            return
+                entry.x == 0
+                || entry.y == 0
+                || entry.z == 0
+                || entry.x == size.x
+                || entry.y == size.y
+                || entry.z == size.z;
+            /*Dector3 from = position + new Dector3(1, 1, 1);
+            Dector3 to = To() + new Dector3(-1, -1, -1);
             return
                 entry.x == from.x
                 || entry.y == from.y
                 || entry.z == from.z
                 || entry.x == to.x
                 || entry.y == to.y
-                || entry.z == to.z;
+                || entry.z == to.z;*/
         }
 
         public List<Dector3> GenerateRoomEntries(Random random, int count)
@@ -78,7 +85,7 @@ namespace Level.Generation.PathLayer.Path.Structures
                         Dector3 point = new Dector3(x, y, z);
                         if (IsOnBorder(point))
                         {
-                            allEntries.Add(point);
+                            allEntries.Add(position + point);
                         }
                     }
                 }
@@ -87,6 +94,7 @@ namespace Level.Generation.PathLayer.Path.Structures
             for (int i = 0; i < count; i++)
             {
                 int index = random.Next(allEntries.Count);
+                UnityEngine.Debug.Log($"Index {index} (collection size: {allEntries.Count})");
                 result.Add(allEntries[index]);
                 allEntries.RemoveAt(index);
             }

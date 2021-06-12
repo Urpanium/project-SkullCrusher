@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text;
+using Level.Generation.Util;
 
 namespace Level.Generation.PathLayer.Path.Map
 {
@@ -81,11 +83,25 @@ namespace Level.Generation.PathLayer.Path.Map
             return pathTile;
         }
 
+        public bool IsEmpty()
+        {
+            return !(CanGoToTop
+                   && CanGoToBottom
+                   && CanGoToForward
+                   && CanGoToLeft
+                   && CanGoToBack
+                   && CanGoToRight
+                   && Changeable);
+        }
 
         public void SetDirectionAccess(int index, bool value)
         {
+
             if (index < 0 || index > 5)
+            {
+                Dector3.DirCheck();
                 throw new Exception($"Invalid direction index: {index}");
+            }
 
             switch (index)
             {
@@ -122,6 +138,7 @@ namespace Level.Generation.PathLayer.Path.Map
             }
         }
 
+        
         public bool GetDirectionAccess(int index)
         {
             if (index < 0 || index > 5)
@@ -146,6 +163,32 @@ namespace Level.Generation.PathLayer.Path.Map
             CanGoToLeft = true;
             CanGoToBack = true;
             CanGoToRight = true;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+            bool[] array =
+            {
+                CanGoToTop,
+                CanGoToBottom,
+                CanGoToForward,
+                CanGoToLeft,
+                CanGoToBack,
+                CanGoToRight,
+                Changeable
+            };
+            for (int i = 0; i < array.Length; i++)
+            {
+                builder.Append(B2S(array[i]));
+            }
+
+            return builder.ToString();
+        }
+
+        private string B2S(bool b)
+        {
+            return b ? "T" : "F";
         }
     }
 }

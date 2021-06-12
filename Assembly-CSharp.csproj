@@ -79,6 +79,7 @@
      <Compile Include="Assets\Scripts\Weapons\Shutter\Shutter.cs" />
      <Compile Include="Assets\Scripts\SingleInstance\InputManagerOld.cs" />
      <Compile Include="Assets\Scripts\Weapons\Weapon.cs" />
+     <Compile Include="Assets\Scripts\Level\Generation\Scripts\PrototypeInfo.cs" />
      <Compile Include="Assets\Scripts\AI\HumanAiLogic.cs" />
      <Compile Include="Assets\Scripts\Level\Generation\PathLayer\Path\SubGenerators\SubGenerator.cs" />
      <Compile Include="Assets\Scripts\Debug\TimeControl.cs" />

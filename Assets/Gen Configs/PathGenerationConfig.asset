@@ -13,26 +13,29 @@ MonoBehaviour:
   m_Name: PathGenerationConfig
   m_EditorClassIdentifier: 
   seed: 0
-  perEntryDecisionsLimit: 5
-  mapSizeSafetyMultiplier: 1
+  perEntryDecisionsLimit: 10
+  mapSizeSafetyMultiplier: 0.25
   minimumPathLength: 50
   maximumPathLength: 100
   maximumEndPointCorridorLength: 50
   minimumPathContinueChance: 0.5
+  prototypeWeight: 0
+  corridorWeight: 0
+  roomWeight: 5
   minimumOffsetBetweenMustSpawnPrototypes: 5
   mustSpawnPrototypeRate: 0
   minimumOffsetBetweenCanSpawnPrototypes: 3
   pathTopDirectionWeight: 1
-  pathBottomDirectionWeight: 1
-  pathForwardDirectionWeight: 1
-  pathLeftDirectionWeight: 1
-  pathBackDirectionWeight: 1
-  pathRightDirectionWeight: 1
-  minimumTopCorridorLength: 3
-  maximumTopCorridorLength: 6
+  pathBottomDirectionWeight: 3
+  pathForwardDirectionWeight: 8
+  pathLeftDirectionWeight: 8
+  pathBackDirectionWeight: 8
+  pathRightDirectionWeight: 8
+  minimumTopCorridorLength: 1
+  maximumTopCorridorLength: 2
   maximumTopCorridorWidth: 3
   maximumTopCorridorHeight: 3
-  minimumBottomCorridorLength: 3
+  minimumBottomCorridorLength: 1
   maximumBottomCorridorLength: 6
   maximumBottomCorridorWidth: 3
   maximumBottomCorridorHeight: 3
@@ -40,15 +43,15 @@ MonoBehaviour:
   maximumForwardCorridorLength: 6
   maximumForwardCorridorWidth: 3
   maximumForwardCorridorHeight: 3
-  minimumLeftCorridorLength: 3
+  minimumLeftCorridorLength: 1
   maximumLeftCorridorLength: 6
   maximumLeftCorridorWidth: 3
   maximumLeftCorridorHeight: 3
-  minimumBackCorridorLength: 3
+  minimumBackCorridorLength: 1
   maximumBackCorridorLength: 6
   maximumBackCorridorWidth: 3
   maximumBackCorridorHeight: 3
-  minimumRightCorridorLength: 3
+  minimumRightCorridorLength: 1
   maximumRightCorridorLength: 6
   maximumRightCorridorWidth: 3
   maximumRightCorridorHeight: 3
@@ -58,3 +61,5 @@ MonoBehaviour:
   maximumRoomXSize: 4
   maximumRoomYSize: 4
   maximumRoomZSize: 4
+  minimumRoomEntriesCount: 3
+  maximumRoomEntriesCount: 6

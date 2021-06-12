@@ -11,6 +11,8 @@ namespace Level.Generation.PathLayer.Path.Prototypes
 
         public int rotation;
 
+        public float weight;
+
         public List<Dector3> entries;
 
         public PathPrototype(Dector3 size, IEnumerable<Dector3> entries)
@@ -23,13 +25,13 @@ namespace Level.Generation.PathLayer.Path.Prototypes
             }
         }
 
-        public List<Dector3> GetRotatedEntries()
+        public List<Dector3> GetRotatedEntries(int rot)
         {
             Dector3 center = size / 2;
             List<Dector3> result = entries;
             for (int i = 0; i < entries.Count; i++)
             {
-                result[i] = center + (result[i] - center).Rotated(rotation);
+                result[i] = center + (result[i] - center).Rotated(rot);
             }
 
             return result;

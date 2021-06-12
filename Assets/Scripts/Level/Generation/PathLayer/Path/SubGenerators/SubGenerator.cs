@@ -19,14 +19,14 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
             weightedRandom = new WeightedRandom(config.seed);
         }
 
-        protected Dector3 GetEntryDirection(PathMap map, Dector3 entry, int offset = 0)
+        protected Dector3 GetEntryDirection(PathMap map, Dector3 entry, int tryNumber = 0)
         {
             Random directionRandom = new Random(entry.x + entry.y * 10 + entry.z * 100);
             int randomOffset = directionRandom.Next(Dector3.Directions.Length);
 
             for (int i = 0; i < Dector3.Directions.Length; i++)
             {
-                int directionIndex = (i + offset + randomOffset) % Dector3.Directions.Length;
+                int directionIndex = (i + tryNumber + randomOffset) % Dector3.Directions.Length;
                 Dector3 direction = Dector3.GetDirection(directionIndex);
                 if (map.IsPositionValid(entry + direction)
                     /*&& map.IsPositionValid(entry - direction) */
@@ -44,22 +44,98 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
             return Dector3.GetDirection(random.Next(Dector3.Directions.Length));
         }
 
-        protected Cuboid GetFreeSpace(PathMap map, Dector3 entry, Dector3 maxSize)
+        protected Cuboid GetFreeSpace(PathMap map, Dector3 entry, bool sameFloor, Dector3 maxSize)
         {
-            Dector3 entryDirection = GetEntryDirection(map, entry);
-            int entryDirectionIndex = Dector3.GetDirectionIndex(entryDirection);
-            if (entryDirectionIndex == -1)
+            Dector3 minBound = entry;
+            Dector3 maxBound = entry;
+
+            Dector3 size = new Dector3();
+            while (size.x < maxSize.x || size.y < maxSize.y || size.z < maxSize.z)
             {
-                throw new Exception($"Corridor max size error: entry direction {entryDirection} index is -1");
+                bool extended = false;
+
+                for (int i = 0; i < Dector3.Directions.Length; i++)
+                {
+                    Dector3 direction = Dector3.Directions[i];
+
+                    bool isPositive = direction.Equals(
+                        new Dector3(
+                            Math.Abs(direction.x),
+                        Math.Abs(direction.y),
+                        Math.Abs(direction.z)
+                        ));
+
+                    Dector3 tryNewMinBound = minBound;
+                    Dector3 tryNewMaxBound = maxBound;
+
+                    if (sameFloor && !isPositive)
+                    {
+                        direction.y = 0;
+                    }
+
+                    if (isPositive)
+                    {
+                        tryNewMaxBound += direction;
+                    }
+                    else
+                    {
+                        tryNewMinBound += direction;
+                    }
+
+                    Cuboid cuboid = Cuboid.FromPoints(tryNewMinBound, tryNewMaxBound);
+                    UnityEngine.Debug.Log($"Room cuboid {cuboid}");
+                    if (CanFitCuboid(map, cuboid))
+                    {
+                        UnityEngine.Debug.Log($"Can fit");
+                        if (sameFloor)
+                        {
+                            minBound.x = tryNewMinBound.x;
+                            minBound.z = tryNewMinBound.y;
+                        }
+                        else
+                        {
+                            minBound = tryNewMinBound;
+                        }
+
+                        maxBound = tryNewMaxBound;
+                        extended = true;
+                    }
+                }
+
+
+                if (!extended)
+                    break;
+                size = maxBound - minBound;
             }
 
-            Dector3 minBound = new Dector3();
-            Dector3 maxBound = new Dector3();
+            if (maxBound.x > maxSize.x - minBound.x)
+            {
+                maxBound.x = minBound.x + maxSize.x;
+            }
+            
+            if (maxBound.y > maxSize.y - minBound.y)
+            {
+                maxBound.y = minBound.y + maxSize.y;
+            }
+
+            if (maxBound.z > maxSize.z - minBound.z)
+            {
+                maxBound.z = minBound.z + maxSize.z;
+            }
+
+            //throw new NotImplementedException();
+            return Cuboid.FromPoints(minBound, maxBound);
+        }
+
+        /*protected Cuboid GetFreeSpace(PathMap map, Dector3 entry, Dector3 maxSize, int differ = 0)
+        {
+            Dector3 minBound = entry;
+            Dector3 maxBound = entry;
 
             /*
              * length is in priority 
              * width and height can be swapped
-             */
+             #1#
             Dector3 size = maxBound - minBound;
             while (size.x < maxSize.x && size.y < maxSize.y && size.z < maxSize.z)
             {
@@ -67,19 +143,19 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
 
                 /*
                  * TODO: expand cuboid
-                 */
+                 #1#
                 Dector3[] points =
                 {
-                    minBound,
-                    maxBound,
+                    minBound, // i i i
+                    maxBound, // a a a
 
-                    new Dector3(minBound.x, minBound.y, maxBound.z),
-                    new Dector3(minBound.x, maxBound.y, minBound.z),
-                    new Dector3(maxBound.x, minBound.y, minBound.z),
+                    new Dector3(minBound.x, minBound.y, maxBound.z), // i i a
+                    new Dector3(minBound.x, maxBound.y, minBound.z), // i a i
+                    new Dector3(maxBound.x, minBound.y, minBound.z), // a i i
 
-                    new Dector3(minBound.x, maxBound.y, maxBound.z),
-                    new Dector3(maxBound.x, minBound.y, maxBound.z),
-                    new Dector3(maxBound.x, maxBound.y, minBound.z)
+                    new Dector3(minBound.x, maxBound.y, maxBound.z), // i a a
+                    new Dector3(maxBound.x, minBound.y, maxBound.z), // a i a
+                    new Dector3(maxBound.x, maxBound.y, minBound.z) // a a i
                 };
 
                 for (int i = 0; i < points.Length; i++)
@@ -89,13 +165,14 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
                     {
                         Dector3 direction = Dector3.Directions[j];
                         Dector3 newPoint = point + direction;
-                        
+
                         byte boundResult = IsNewBound(minBound, maxBound, newPoint);
-                        
+
                         if (boundResult != 0)
                         {
                             Dector3 newMinBound = minBound;
                             Dector3 newMaxBound = maxBound;
+
                             if (boundResult == 1)
                                 newMinBound = newPoint;
                             else
@@ -119,14 +196,14 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
 
 
             return Cuboid.FromPoints(minBound, maxBound);
-        }
+        }*/
 
 
         private byte IsNewBound(Dector3 minBound, Dector3 maxBound, Dector3 point)
         {
             if (
-                point.x < minBound.x &&
-                point.y < minBound.y &&
+                point.x < minBound.x ||
+                point.y < minBound.y ||
                 point.z < minBound.z
             )
             {
@@ -134,12 +211,13 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
             }
 
             if (
-                point.x > maxBound.x &&
-                point.y > maxBound.y &&
+                point.x > maxBound.x ||
+                point.y > maxBound.y ||
                 point.z > maxBound.z
             )
             {
-                return 1;
+                // долбоёб блять
+                return 2;
             }
 
 

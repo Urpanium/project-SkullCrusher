@@ -43,20 +43,43 @@ namespace Level.Generation.PathLayer.Path
                 PathSnapshot.Start(config, GetMapSize(), mustSpawnPrototypes.Count, canSpawnPrototypes.Count);
         }
 
+        public PathMap GenStep()
+        {
+            if (snapshots.Count == 0)
+            {
+                EvaluateDecision(StartDecision());
+                SaveSnapshot();
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"snapshots: {snapshots.Count}");
+                PathDecision decision = GenerateDecision();
+                if (decision.type != PathDecisionType.End)
+                {
+                    EvaluateDecision(decision);
+                    SaveSnapshot();
+                }
+                else
+                {
+                    UnityEngine.Debug.Log("End");
+                }
+            }
+
+            return currentSnapshot.map;
+        }
+
         public PathMap Generate()
         {
             PathDecision decision = StartDecision();
-            try
+            EvaluateDecision(decision);
+
+            decision = GenerateDecision();
+            while (decision.type != PathDecisionType.End)
             {
-                decision = StartDecision();
                 EvaluateDecision(decision);
-            }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.LogError(e);
+                decision = GenerateDecision();
             }
 
-            Dector3.DirCheck();
             return currentSnapshot.map;
         }
 
@@ -68,14 +91,38 @@ namespace Level.Generation.PathLayer.Path
             PathDecision decision = new PathDecision();
 
 
+            /*
+             * currentEntries.Count variants
+             */
             Dector3 entry = GetRandomEntry(tryNumber);
+            if (entry.x == -1)
+            {
+                Rollback();
+                return GenerateDecision(currentSnapshot.restores);
+            }
 
 
             if (MustEndPath())
             {
-                decision.type = PathDecisionType.End;
+                PathPrototype prototype = mustSpawnPrototypes[mustSpawnPrototypes.Count - 1];
 
-                return decision;
+                if (currentSnapshot.prototypeGenerator.TryFitPrototype(currentSnapshot.map, prototype, entry,
+                    out Dector3 minPoint,
+                    out int rotation))
+                {
+                    decision.type = PathDecisionType.End;
+
+                    decision.entry = minPoint;
+                    decision.size = prototype.size;
+
+                    decision.prototypeId = mustSpawnPrototypes.Count - 1;
+                    decision.rotation = rotation;
+                    decision.newEntries = prototype.GetRotatedEntries(rotation);
+                    return decision;
+                }
+
+                Rollback();
+                return GenerateDecision(currentSnapshot.restores);
             }
 
             if (IsItTimeToSpawnAFuckingMustSpawnPrototype())
@@ -83,28 +130,143 @@ namespace Level.Generation.PathLayer.Path
                 int prototypeId = mustSpawnPrototypes.Count - currentSnapshot.mustSpawnPrototypesRemain;
                 PathPrototype prototype = mustSpawnPrototypes[prototypeId];
 
-                Dector3 minPoint;
-                int rotation;
-                if (currentSnapshot.prototypeGenerator.TryFitPrototype(currentSnapshot.map, prototype, entry, out minPoint,
-                    out rotation))
+                if (currentSnapshot.prototypeGenerator.TryFitPrototype(currentSnapshot.map, prototype, entry,
+                    out Dector3 minPoint,
+                    out int rotation))
                 {
                     decision.type = PathDecisionType.Prototype;
+                    decision.entry = minPoint;
+
                     decision.prototypeId = prototypeId;
+                    decision.rotation = rotation;
+                    decision.newEntries = prototype.GetRotatedEntries(rotation);
+                    return decision;
                 }
-                else
-                {
-                    /*
-                     * TODO: rollback shit, we can't build
-                     */
-                }
+
+                /*
+                 * rollback shit, we can't build a ziggurat
+                 */
+                Rollback();
+                return GenerateDecision(currentSnapshot.restores);
             }
 
-            return decision;
+            /*
+             * ================================================================
+             * ================= F R E E D O M    I S L A N D =================
+             * ================================================================
+             */
+            /*
+             * looks like we are free to do anything we want here
+             */
+            UnityEngine.Debug.Log("Freedom");
+            /*
+             * decide what to generate
+             */
+            List<float> structuresWeights = new List<float>
+                {config.corridorWeight, config.prototypeWeight, config.roomWeight};
+            /*
+             * divide by entries to try all variants
+             */
+
+            /*
+             * 3 variants 
+             */
+            int randomIndex = (currentSnapshot.weightedRandom.RandomWeightedIndex(structuresWeights) +
+                               tryNumber / currentSnapshot.currentEntries.Count) % 3;
+            UnityEngine.Debug.Log($"Random index is {randomIndex}");
+            if (randomIndex == 0)
+            {
+                /*
+                 * corridor
+                 */
+                Cuboid corridor =
+                    currentSnapshot.corridorGenerator.Generate(currentSnapshot.map, entry, out Dector3 newEntry,
+                        tryNumber);
+                if (newEntry.x != -1)
+                {
+                    decision.type = PathDecisionType.Corridor;
+                    decision.entry = corridor.position;
+                    decision.size = corridor.size;
+                    decision.newEntries = new List<Dector3> {newEntry};
+                    return decision;
+                }
+
+                Rollback();
+                return GenerateDecision(currentSnapshot.restores);
+            }
+
+            if (randomIndex == 1)
+            {
+                if (debugMode)
+                {
+                    Rollback();
+                    return GenerateDecision(currentSnapshot.restores);
+                }
+
+                /*
+                 * prototype (CanSpawn)
+                 */
+                List<float> weights = new List<float>();
+                for (int i = 0; i < canSpawnPrototypes.Count; i++)
+                {
+                    weights.Add(canSpawnPrototypes[i].weight);
+                }
+
+                int index = currentSnapshot.weightedRandom.RandomWeightedIndex(weights);
+
+                PathPrototype prototype = canSpawnPrototypes[index];
+
+                if (currentSnapshot.prototypeGenerator.TryFitPrototype(currentSnapshot.map, prototype, entry,
+                    out Dector3 minPoint, out int rotation))
+                {
+                    int prototypeId = mustSpawnPrototypes.Count + index;
+
+                    decision.type = PathDecisionType.Prototype;
+                    decision.entry = minPoint;
+                    decision.size = prototype.size.Rotated(rotation);
+                    decision.prototypeId = prototypeId;
+                    decision.rotation = rotation;
+                    decision.newEntries = prototype.GetRotatedEntries(rotation);
+                    return decision;
+                }
+
+                Rollback();
+                return GenerateDecision(currentSnapshot.restores);
+            }
+
+            if (randomIndex == 2)
+            {
+                /*
+                 * room
+                 */
+                Cuboid room =
+                    currentSnapshot.roomGenerator.Generate(currentSnapshot.map, entry, out List<Dector3> newEntries, true,
+                        tryNumber);
+                if (room.position.x != -1)
+                {
+                    decision.type = PathDecisionType.Room;
+                    decision.entry = room.position;
+                    decision.size = room.size;
+                    decision.newEntries = newEntries;
+                    return decision;
+                }
+
+                Rollback();
+                return GenerateDecision(currentSnapshot.restores);
+            }
+
+
+            throw new Exception("Decision generation ended with no decision to generate.");
         }
 
         private Dector3 GetRandomEntry(int tryNumber = 0)
         {
             List<Dector3> currentEntries = currentSnapshot.currentEntries;
+            if (currentEntries.Count == 0)
+            {
+                return new Dector3(-1, -1, -1);
+            }
+
             Random entriesShuffleRandom = new Random(config.seed);
 
             for (int i = 0; i < currentEntries.Count / 2; i++)
@@ -117,7 +279,7 @@ namespace Level.Generation.PathLayer.Path
                 currentEntries[index1] = buffer;
             }
 
-            return currentEntries[tryNumber];
+            return currentEntries[tryNumber % currentEntries.Count];
         }
 
         private bool IsItTimeToSpawnAFuckingMustSpawnPrototype()
@@ -142,6 +304,7 @@ namespace Level.Generation.PathLayer.Path
             float value = (float) currentSnapshot.random.NextDouble();
             return value < config.mustSpawnPrototypeRate;
         }
+
 
         private bool CanEndPath()
         {
@@ -170,15 +333,39 @@ namespace Level.Generation.PathLayer.Path
         private bool EvaluateDecision(PathDecision decision)
         {
             UnityEngine.Debug.Log($"DECISION: {decision}");
+            for (int i = 0; i < decision.newEntries.Count; i++)
+            {
+                currentSnapshot.allEntries.Add(decision.newEntries[i]);
+            }
+
+            currentSnapshot.currentEntries = decision.newEntries;
 
             if (decision.type == PathDecisionType.Room
                 || decision.type == PathDecisionType.Corridor)
             {
                 Cuboid cuboid = Cuboid.FromPosition(decision.entry, decision.size);
+                /*
+                 * already checkin in generators
+                 */
+                /*if (CanFitCuboid(currentSnapshot.map, cuboid))
+                {*/
+                BuildCuboid(cuboid, true);
+                currentSnapshot.currentPathLength += cuboid.size.PseudoDistance();
+
+                return true;
+                /*}*/
+            }
+
+            if (decision.type == PathDecisionType.Prototype)
+            {
+                PathPrototype prototype = GetPrototypeById(decision.prototypeId);
+                prototype.rotation = decision.rotation;
+                Cuboid cuboid = Cuboid.FromPosition(decision.entry, decision.size.Rotated(decision.rotation));
+
                 if (CanFitCuboid(currentSnapshot.map, cuboid))
                 {
-                    BuildCuboid(cuboid, decision.newEntries, false, true);
-                    return true;
+                    BuildPrototype(prototype);
+                    currentSnapshot.currentPathLength += cuboid.size.PseudoDistance();
                 }
             }
 
@@ -194,7 +381,7 @@ namespace Level.Generation.PathLayer.Path
             if (debugMode)
             {
                 Cuboid corridor =
-                    currentSnapshot.corridorGenerator.Generate(currentSnapshot.map, startEntry, out var newEntry);
+                    currentSnapshot.corridorGenerator.Generate(currentSnapshot.map, startEntry, out var newEntry, 0);
                 decision.type = PathDecisionType.Corridor;
 
                 decision.entry = corridor.position;
@@ -213,17 +400,14 @@ namespace Level.Generation.PathLayer.Path
             return decision;
         }
 
-
-        public void Reset()
+        private PathPrototype GetPrototypeById(int id)
         {
-            if (snapshots == null)
-                snapshots = new List<PathSnapshot>();
-            snapshots.Clear();
-            currentSnapshot =
-                PathSnapshot.Start(config, GetMapSize(), mustSpawnPrototypes.Count, canSpawnPrototypes.Count);
+            if (id > mustSpawnPrototypes.Count)
+                return canSpawnPrototypes[id - mustSpawnPrototypes.Count];
+            return mustSpawnPrototypes[id];
         }
 
-        public void BuildCuboid(Cuboid cuboid, List<Dector3> entries, bool checkPointsOfCuboidOnBorder = false,
+        private void BuildCuboid(Cuboid cuboid,
             bool changeable = false)
         {
             PathMap map = currentSnapshot.map;
@@ -259,8 +443,31 @@ namespace Level.Generation.PathLayer.Path
 
                                 bool access = isValid && isInside;
 
-                                pathTile.SetDirectionAccess(Dector3.GetDirectionIndex(direction),
-                                    access);
+                                if (isValid)
+                                {
+                                    PathTile nearTile = PathTile.FromByte(map.GetTile(nearPosition));
+
+                                    if (currentSnapshot.allEntries.Contains(nearPosition) /*||
+                                        (nearTile.Changeable 
+                                        && changeable)*/ )
+                                    {
+                                        UnityEngine.Debug.Log($"SetDirectionAccess direction {direction * -1} index {Dector3.GetDirectionIndex(direction * -1)}");
+                                        nearTile.SetDirectionAccess(
+                                            Dector3.GetDirectionIndex(direction * -1),
+                                            true
+                                        );
+                                        map.SetTile(nearPosition, nearTile);
+                                        UnityEngine.Debug.Log(
+                                            $"pos {nearPosition} directions: {direction} {direction * -1}");
+                                        access = true;
+                                    }
+                                }
+
+                                pathTile.SetDirectionAccess(
+                                    i,
+                                    access
+                                );
+                                pathTile.Changeable = changeable;
                             }
                         }
 
@@ -270,9 +477,13 @@ namespace Level.Generation.PathLayer.Path
             }
         }
 
-        public void BuildPrototype(PathPrototype prototype)
+        private void BuildPrototype(PathPrototype prototype)
         {
-            PathMap map = currentSnapshot.map;
+            /*
+             * TODO: implement
+             */
+            //PathMap map = currentSnapshot.map;
+            UnityEngine.Debug.Log("BuildPrototype() was called, yea");
         }
 
         private bool CanFitCuboid(PathMap map, Cuboid cuboid)
@@ -297,7 +508,7 @@ namespace Level.Generation.PathLayer.Path
                     {
                         if (!map.IsTileEmpty(x, y, z))
                         {
-                            UnityEngine.Debug.Log("Cant fit because of non empty tiles");
+                            UnityEngine.Debug.Log("Can't fit because of non empty tiles");
                             return false;
                         }
                     }
@@ -307,7 +518,6 @@ namespace Level.Generation.PathLayer.Path
             return true;
         }
 
-
         private Dector3 GetMapSize()
         {
             /*
@@ -315,6 +525,13 @@ namespace Level.Generation.PathLayer.Path
              */
 
             Dector3 prototypesSizes = new Dector3();
+            Dector3 corridorsSizes = new Dector3();
+
+            int configPathLength = config.maximumPathLength;
+
+            float[] pathDirectionsWeightsNormalized = config.PathDirectionsWeights;
+            float maxDirectionWeight = 0.01f;
+
             foreach (var prototype in mustSpawnPrototypes)
             {
                 prototypesSizes += prototype.size;
@@ -325,10 +542,7 @@ namespace Level.Generation.PathLayer.Path
                 prototypesSizes += prototype.size;
             }
 
-            Dector3 corridorsSizes = new Dector3();
-            int configPathLength = config.maximumPathLength;
-            float[] pathDirectionsWeightsNormalized = config.PathDirectionsWeights;
-            float maxDirectionWeight = 0.01f;
+
             foreach (var t in pathDirectionsWeightsNormalized)
             {
                 if (t > maxDirectionWeight)
@@ -343,18 +557,79 @@ namespace Level.Generation.PathLayer.Path
 
             for (int i = 0; i < 6; i++)
             {
-                float multiplier = configPathLength * config.MaximumCorridorsLengths[i] *
-                                   pathDirectionsWeightsNormalized[i];
-                corridorsSizes += Dector3.Directions[i].WithAbsAxis() *
-                                  (int) Math.Round(multiplier + 0.4f);
+                float multiplier = configPathLength
+                                   * config.MaximumCorridorsLengths[i]
+                                   * pathDirectionsWeightsNormalized[i];
+
+                Dector3 direction = Dector3.Directions[i];
+                Dector3 dectorToAdd = new Dector3(
+                    (int) Math.Round(Math.Abs(direction.x) * multiplier),
+                    (int) Math.Round(Math.Abs(direction.y) * multiplier),
+                    (int) Math.Round(Math.Abs(direction.z) * multiplier)
+                );
+                UnityEngine.Debug.Log($"Direction {direction} multiplied by {multiplier}");
+                corridorsSizes += dectorToAdd;
             }
 
 
-            Dector3 mapSize = (corridorsSizes + prototypesSizes) *
-                              (int) Math.Round(config.mapSizeSafetyMultiplier + 0.4f);
+            Dector3 mapSize = corridorsSizes + prototypesSizes;
+
+            float s = config.mapSizeSafetyMultiplier;
+
+            mapSize = new Dector3((int) Math.Round(mapSize.x * s), (int) Math.Round(mapSize.y * s),
+                (int) Math.Round(mapSize.z * s));
 
             UnityEngine.Debug.Log($"GENERATED MAP SIZE: {mapSize}");
             return mapSize;
+        }
+
+        private void SaveSnapshot()
+        {
+            currentSnapshot.restores = 0;
+            snapshots.Add(currentSnapshot);
+        }
+
+        private void Rollback()
+        {
+            int index = snapshots.Count - 1;
+            while (index > 0 && snapshots[index].restores > config.perEntryDecisionsLimit)
+            {
+                snapshots.RemoveAt(index);
+                index--;
+            }
+
+
+            if (index <= 0)
+            {
+                //UnityEngine.Debug.Log("Returned to start");
+                throw new Exception("Returned to start");
+                index = 0;
+            }
+
+            /*
+             * increase restores count if it is not start
+             */
+            currentSnapshot = snapshots[index];
+            snapshots[index].restores++;
+        }
+
+        public List<Dector3> GetCurrentEntries()
+        {
+            return currentSnapshot.currentEntries;
+        }
+
+        public List<Dector3> GetAllEntries()
+        {
+            return currentSnapshot.allEntries;
+        }
+
+        public void Reset()
+        {
+            if (snapshots == null)
+                snapshots = new List<PathSnapshot>();
+            snapshots.Clear();
+            currentSnapshot =
+                PathSnapshot.Start(config, GetMapSize(), mustSpawnPrototypes.Count, canSpawnPrototypes.Count);
         }
     }
 }

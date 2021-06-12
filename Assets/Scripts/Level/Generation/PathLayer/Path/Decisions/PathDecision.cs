@@ -52,7 +52,7 @@ namespace Level.Generation.PathLayer.Path.Decisions
                 }
                 case PathDecisionType.Room:
                 {
-                    return $"Room form {entry} to {size}";
+                    return $"Room form {entry} with size {size}";
                 }
                     
             }

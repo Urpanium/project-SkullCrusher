@@ -94,6 +94,11 @@ namespace Level.Generation.Util
             return randomDector3;
         }
 
+        public int PseudoDistance()
+        {
+            return Math.Max(x, Math.Max(y, z));
+        }
+
         public static bool IsDifferentOnlyByOneAxis(Dector3 d1, Dector3 d2)
         {
             int differences = 0;
@@ -180,7 +185,7 @@ namespace Level.Generation.Util
         {
             // это были степени отчаяния и безумия, ага
 
-            /*if (direction.Equals(new Dector3(0, 1, 0)))
+            if (direction.Equals(new Dector3(0, 1, 0)))
                 return 0;
             if (direction.Equals(new Dector3(0, -1, 0)))
                 return 1;
@@ -192,7 +197,7 @@ namespace Level.Generation.Util
                 return 4;
             if (direction.Equals(new Dector3(1, 0, 0)))
                 return 5;
-            return -1;*/
+            return -1;
 
             /*if (direction.Equals(Up))
                 return 0;
@@ -234,9 +239,12 @@ namespace Level.Generation.Util
         public static void DirCheck()
         {
             UnityEngine.Debug.Log("DIRECTION CHECK:");
-            foreach (Dector3 direction in Directions)
+            for (int i = 0; i < Directions.Length; i++)
             {
-                UnityEngine.Debug.Log($"{direction}");
+                Dector3 direction1 = Directions[i];
+                Dector3 direction2 = GetDirection(i);
+                UnityEngine.Debug.Log(
+                    $"{direction1} {direction2}, eq: {direction1.Equals(direction2)}, index: {GetDirectionIndex(direction1)}");
             }
         }
 
@@ -314,10 +322,11 @@ namespace Level.Generation.Util
 
         public static Dector3 operator *(Dector3 dector3, int multiplier)
         {
-            dector3.x *= multiplier;
-            dector3.y *= multiplier;
-            dector3.z *= multiplier;
-            return dector3;
+            return new Dector3(
+                dector3.x * multiplier,
+                dector3.y * multiplier,
+                dector3.z * multiplier
+            );
         }
 
         public static Dector3 operator /(Dector3 d, int i)

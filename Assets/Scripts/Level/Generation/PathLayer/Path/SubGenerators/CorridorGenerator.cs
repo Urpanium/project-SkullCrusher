@@ -22,9 +22,9 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
         }
 
 
-        public Cuboid Generate(PathMap map, Dector3 entry, out Dector3 newEntry)
+        public Cuboid Generate(PathMap map, Dector3 entry, out Dector3 newEntry, int tryNumber)
         {
-            Dector3 entryDirection = GetEntryDirection(map, entry);
+            Dector3 entryDirection = GetEntryDirection(map, entry, tryNumber);
 
 
             Dector3 startPosition = entry + entryDirection;
@@ -36,12 +36,10 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
 
             for (int i = 0; i < directionsList.Count; i++)
             {
-                Dector3 direction = directionsList[i];
-                UnityEngine.Debug.Log($"Is valid ({direction}: {IsValidEntryDirection(map, startPosition, direction)}");
+                Dector3 direction = directionsList[(i + tryNumber) % directionsList.Count];
                 if (IsValidEntryDirection(map, startPosition, direction))
                 {
                     Dector3 maxSize = GetMaxCorridorSize(map, startPosition, direction);
-                    UnityEngine.Debug.Log($"Corridor max size: {maxSize}");
                     Dector3 minSize = new Dector3(1, 1, config.MinimumCorridorsLengths[i]);
                     if (maxSize.z >= minSize.z)
                     {
@@ -55,10 +53,7 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
                         tile.SetDirectionAccess(Dector3.GetDirectionIndex(entryDirection), true);
 
                         newEntry = entry + entryDirection * size.z;
-                        UnityEngine.Debug.Log(
-                            $"Generated corridor from {entry} to {newEntry}, width: {size.x}, height: {size.y}");
                         Cuboid cuboid = CorridorToCuboid(entry, newEntry, size.x, size.y);
-                        UnityEngine.Debug.Log($"Corridor cuboid: {cuboid}");
                         return cuboid;
                     }
                 }
@@ -100,6 +95,12 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
                 {
                     for (int length = minPossibleSize.z; length <= maxPossibleSize.z; length++)
                     {
+                        /*
+                         * can break length cycle because it will be useless
+                         */
+                        if(width % 2 !=0 && height % 2 != 0)
+                            break;
+                        
                         if (CanFitCorridor(map, entry, entry + entryDirection * length, width, height))
                         {
                             size.x = width;
@@ -121,10 +122,19 @@ namespace Level.Generation.PathLayer.Path.SubGenerators
 
         private Cuboid CorridorToCuboid(Dector3 from, Dector3 to, int width, int height)
         {
-            if (width % 2 == 0 || height % 2 == 0)
-            {
-                throw new Exception("Even width or/and height are not allowed");
-            }
+            /*if (width % 2 == 0 || height % 2 == 0)
+            {*/
+                /*
+                 * well, fuck
+                 */
+                
+                /*throw new Exception("Even width or/and height are not allowed");*/
+            /*}*/
+            
+            if (width % 2 == 0)
+                width--;
+            if (height % 2 == 0)
+                height--;
 
             (Dector3, Dector3) minAndMax = Dector3.ToMinAndMax(from, to);
             from = minAndMax.Item1;
