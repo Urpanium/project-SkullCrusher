@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99da320bcf6e417398a5212b6bd1abfe, type: 3}
   m_Name: PathGenerationConfig
   m_EditorClassIdentifier: 
-  seed: 0
-  perEntryDecisionsLimit: 10
+  seed: 1
+  perEntryDecisionsLimit: 2
   mapSizeSafetyMultiplier: 0.25
   minimumPathLength: 50
   maximumPathLength: 100

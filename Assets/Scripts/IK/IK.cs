@@ -30,15 +30,13 @@ namespace IK
         private Quaternion startRotationTarget;
         private Transform root;
 
-        //some creepy stuff to make it work on Unity 5
-        public const float kEpsilonNormalSqrt = 1e-15F;
-        void Start()
+        private void Start()
         {
             if (autoInit)
                 Init();
         }
 
-        public void Init()
+        private void Init()
         {
             bones = new Transform[chainLength + 1];
             positions = new Vector3[chainLength + 1];
@@ -199,7 +197,7 @@ namespace IK
                 current.rotation = root.rotation * rotation;
         }
 
-        public float SignedAngle(Vector3 from, Vector3 to, Vector3 axis)
+        private float SignedAngle(Vector3 from, Vector3 to, Vector3 axis)
         {
             float unsignedAngle = Angle(from, to);
 
@@ -210,30 +208,29 @@ namespace IK
             return unsignedAngle * sign;
         }
 
-        public Vector3 ClosestPointOnPlane(Plane plane, Vector3 point)
+        private Vector3 ClosestPointOnPlane(Plane plane, Vector3 point)
         {
             float pointToPlaneDistance = Vector3.Dot(plane.normal, point) + plane.distance;
             return point - (plane.normal * pointToPlaneDistance);
         }
 
-    
 
-        public static float Dot(Vector3 lhs, Vector3 rhs)
+        private static float Dot(Vector3 lhs, Vector3 rhs)
         {
             return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
         }
 
-        public float Angle(Vector3 from, Vector3 to)
+        private static float Angle(Vector3 from, Vector3 to)
         {
-            float denominator = (float) Mathf.Sqrt(from.sqrMagnitude * to.sqrMagnitude);
-            if (denominator < kEpsilonNormalSqrt)
+            float denominator = Mathf.Sqrt(from.sqrMagnitude * to.sqrMagnitude);
+            if (denominator < Mathf.Epsilon)
                 return 0F;
 
             float dot = Mathf.Clamp(Dot(from, to) / denominator, -1F, 1F);
-            return ((float) Mathf.Acos(dot)) * Mathf.Rad2Deg;
+            return Mathf.Acos(dot) * Mathf.Rad2Deg;
         }
 
-        void OnDrawGizmos()
+        private void OnDrawGizmos()
         {
             Gizmos.color = Color.red;
             var current = transform;

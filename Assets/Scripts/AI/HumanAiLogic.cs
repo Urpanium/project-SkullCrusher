@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Numerics;
 using Character;
+using Damages;
 using Preferences;
+using SingleInstance;
 using UnityEngine;
 using UnityEngine.AI;
 using Weapons;
@@ -85,9 +87,7 @@ namespace AI
 
         public Transform armPivot;
         public Weapon equippedWeapon;
-
-
-        // TODO: coroutines?
+        
         private float currentContactTime;
         private float currentChaseTime;
 
@@ -124,11 +124,15 @@ namespace AI
 
             initialPosition = transform.position;
             EquipWeapon(equippedWeapon);
+            
+            // fixes agent's random rotation at start
+            aiAgent.LookAtDirection(transform.forward);
         }
 
         public void EquipWeapon(Weapon weapon)
         {
-            if (!weapon)
+            // TODO: implement weapon equipment
+            /*if (!weapon)
                 return;
             DropEquippedWeapon();
             Transform weaponTransform = weapon.transform;
@@ -137,7 +141,7 @@ namespace AI
             weaponTransform.parent = armPivot;
             weaponTransform.localPosition = weapon.offset;
             weaponTransform.forward = armPivot.forward;
-            weaponTransform.GetComponent<Rigidbody>().isKinematic = true;
+            weaponTransform.GetComponent<Rigidbody>().isKinematic = true;*/
         }
 
         public void DropEquippedWeapon()
@@ -271,7 +275,7 @@ namespace AI
             // TODO: shoot this motherfucker
             if (equippedWeapon && IsWeaponPointingAtPlayer())
                 // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
-                equippedWeapon.StandardFire();
+                equippedWeapon.Fire();
         }
 
         private void AttackingStateTransitionCheck()
@@ -395,19 +399,18 @@ namespace AI
         {
             currentSearchTime += Time.deltaTime;
             currentSearchIntervalTime += Time.deltaTime;
-            if (aiAgent.IsLookedAtTarget())
+            /*if (aiAgent.IsLookedAtTarget())
             {
                 Vector3 lookDirection = Random.insideUnitSphere;
                 lookDirection.y *= 2;
                 lookDirection.Normalize();
                 aiAgent.LookAtDirection(lookDirection);
-            }
+            }*/
 
             if (currentSearchIntervalTime > searchPointChangeInterval && aiAgent.IsArrivedAtTargetPosition())
             {
                 Vector3 pointToSearch;
-                bool successful = TryGetRandomPointToSearch(out pointToSearch);
-                if (successful)
+                if (TryGetRandomPointToSearch(out pointToSearch))
                 {
                     currentSearchIntervalTime = 0.0f;
                     aiAgent.GoTo(pointToSearch);

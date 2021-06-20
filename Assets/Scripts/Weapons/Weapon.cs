@@ -1,200 +1,145 @@
-﻿using System;
-using Character;
-using Preferences;
+﻿using Preferences;
+using SingleInstance;
 using UnityEngine;
-using UnityEngine.Events;
-using Math = UnityEngine.ProBuilder.Math;
-using Random = UnityEngine.Random;
+using Util;
+using Weapons.Classes.Parameters;
+using Weapons.Enums;
+using Weapons.Parameters;
 
 namespace Weapons
 {
     public class Weapon : MonoBehaviour
     {
+        // invert x for left
 
+        public Vector3 cameraOffsetToRight = new Vector3(0.35f, -0.47f, 0.60f);
 
-        public bool isEquipped = false;
-        public bool isEquippedByPlayer = false;
-        public Vector3 offset = new Vector3(0.35f, -0.47f, 0.60f);
+        [Range(0, 9)] public int playerSlot = 1;
 
-        public Controller controller;
+        public Transform owner;
+        public bool selected;
+
+        // дядя Боб, блять, не бей
+        // макс иди нахуй, отличное название переменной
+        public int ammoAmountIfPlayerAlreadyHasThisWeaponAndTriesToPickupIt;
+
         public WeaponParameters weaponParameters;
 
+        public Transform bullet;
         public BulletParameters bulletParameters;
 
-        public UnityEvent fire1Event; // default fire
-        public UnityEvent fire2Event; // alternative fire
-        public UnityEvent reloadEvent;
-        public UnityEvent onReloadStartedEvent;
-        public UnityEvent onReloadedEvent;
-        public UnityEvent onNewShotReadyEvent;
+        public Transform shutter;
+        public ShutterParameters shutterParameters;
 
-        // just empty transforms to represent position
-        // and orientation of necessary weapon parts 
-        public Transform muzzle;
+        public Transform trigger;
+        public TriggerParameters triggerParameters;
 
-        public global::Weapons.Shutter.Shutter shutter;
-
-        // must point at direction in which shells will
-        // be ejected 
         public Transform ejector;
+        public EjectorParameters ejectorParameters;
 
-        // will be spawned in ejector
-        public Transform shellPrefab;
-        public Transform bulletPrefab;
+        [Header("Positions")] public Transform muzzle;
 
-        // TODO: can attach rigidbody to it 
+        public Transform shell;
         public Transform clip;
-
-        public float shellInitialVelocityMultiplier = 1.0f;
-        public float shellInitialAngularVelocityMultiplier = 1.0f;
-
 
         public int currentClipAmmoAmount;
         public int currentRemainedAmmoAmount; // does not include currentClipAmmoAmount
 
-        [Header("Gizmo settings")] public int gizmoShellEjectionTrajectorySamples = 120;
-
-        /*
-         * ================================PRIVATE================================
-         */
-
+        // global
         private BulletManager bulletManager;
-        private WeaponManager weaponManager;
 
         private float timePerShot;
-
         private float currentTimePerShot;
-
-        //private bool reloading;
         private float currentReloadTime;
+        
+        // shutter
+        private Vector3 shutterInitialPosition;
+        private ShutterState currentShutterState;
+        private float currentShutterTime;
 
         private void Start()
         {
+            // looks shitty, but ok for now
+            if (!muzzle)
+                UnityEngine.Debug.LogError("Muzzle is not assigned", this);
+            if (!bullet)
+                UnityEngine.Debug.LogError("Bullet is not assigned", this);
+
+            if (!shell)
+                UnityEngine.Debug.LogWarning("Shell is not assigned", this);
+            if (!ejector)
+                UnityEngine.Debug.LogWarning("Ejector is not assigned", this);
+            if (!clip)
+                UnityEngine.Debug.LogWarning("Clip is not assigned", this);
+            if (!trigger)
+                UnityEngine.Debug.LogWarning("Trigger is not assigned", this);
+            if (!shutter)
+                UnityEngine.Debug.LogWarning("Shutter is not assigned", this);
+
             GameObject globalController = GameObject.Find(Settings.GameObjects.GlobalController);
             bulletManager = globalController.GetComponent<BulletManager>();
-            
-            controller = GameObject.FindGameObjectWithTag(Settings.Tags.Player).GetComponent<Controller>();
-            weaponManager = controller.GetComponent<WeaponManager>();
 
-            currentTimePerShot = timePerShot;
+            currentRemainedAmmoAmount = weaponParameters.totalAmmoAmount;
+            int clipAmmo = GetAmmoAmountForReload();
+            currentClipAmmoAmount = clipAmmo;
+            currentRemainedAmmoAmount -= clipAmmo;
 
-            currentClipAmmoAmount = weaponParameters.clipAmmoAmount;
-            currentRemainedAmmoAmount = weaponParameters.totalAmmoAmount - weaponParameters.clipAmmoAmount;
+            shutterInitialPosition = shutter.localPosition;
         }
 
         private void Update()
         {
-            //TODO: consider removing on release
-            timePerShot = 1 / weaponParameters.shootRate;
-
-            if (currentTimePerShot > 0)
-            {
-                currentTimePerShot -= Time.deltaTime;
-                if (currentReloadTime <= 0)
-                    OnNewShotReady();
-            }
-
-            if (currentReloadTime > 0)
-            {
-                currentReloadTime -= Time.deltaTime;
-                if (currentReloadTime <= 0)
-                    OnReloaded();
-            }
-            
-            if (currentClipAmmoAmount == 0 && currentReloadTime <= 0)
-            {
-                StandardReload();
-            }
+            UpdateReloading();
+            UpdateShooting();
+            UpdateShutter();
+            UpdateTrigger();
         }
 
-        public void StandardFire()
+        public void Fire()
         {
             if (!CanFire())
+            {
+                // play sound, but not now
                 return;
+            }
 
-            // decrease clip ammo amount
+
+            Transform bulletTransform = Instantiate(bullet, muzzle.position, muzzle.rotation);
+            bulletManager.AddBullet(bulletTransform, bulletParameters, currentClipAmmoAmount, 1.0f);
+
             currentClipAmmoAmount--;
-            // restart the timer
             currentTimePerShot = timePerShot;
-
-            shutter.OnShoot();
-
-            fire1Event.Invoke();
-
-            Transform bulletTransform = MakeBullet();
-            if (isEquippedByPlayer)
-            {
-                bulletTransform.forward = controller.GetLookPoint(bulletManager.shootableMask, weaponManager.weaponCheckDistance) - muzzle.position;
-            }
-            
-            Bullet bullet = bulletTransform.gameObject.AddComponent<Bullet>();
-            bullet.parameters = bulletParameters;
-            bullet.seed = currentClipAmmoAmount;
-            bullet.ricochetChance = bulletParameters.initialRicochetChance;
-            
-            //TODO: check this
-            bulletManager.AddBullet(bullet);
-
-            if (currentClipAmmoAmount == 0)
-            {
-                StandardReload();
-            }
+            currentShutterState = ShutterState.Sliding;
+            currentShutterTime = shutterParameters.slideTime;
         }
 
-        private Transform MakeBullet()
+        public void FireAtPosition(Vector3 position)
         {
-            return Instantiate(bulletPrefab, muzzle.position, muzzle.rotation);
+            if (!CanFire())
+            {
+                // play sound, but not now
+                return;
+            }
+            Vector3 delta = (position - muzzle.position).normalized;
+            Transform bulletTransform = Instantiate(bullet, muzzle.position, Quaternion.LookRotation(delta));
+            bulletManager.AddBullet(bulletTransform, bulletParameters, currentClipAmmoAmount, 1.0f);
+            
+            currentClipAmmoAmount--;
+            currentTimePerShot = timePerShot;
+            currentShutterState = ShutterState.Sliding;
+            currentShutterTime = shutterParameters.slideTime;
         }
 
 
-        public void StandardReload()
+        public void Reload()
         {
-            int availableAmmo = GetAvailableForReloadAmmo();
-            if (availableAmmo > 0 && currentReloadTime <= 0)
+            int availableAmmo = GetAmmoAmountForReload();
+
+            if (availableAmmo > 0)
             {
                 currentReloadTime = weaponParameters.reloadTime;
-                // start reloading animation
-                onReloadStartedEvent.Invoke();
             }
         }
-
-        private void OnNewShotReady()
-        {
-            // TODO: remove?
-            onNewShotReadyEvent.Invoke();
-        }
-
-        private void OnReloaded()
-        {
-            onReloadedEvent.Invoke();
-            int ammo = GetAvailableForReloadAmmo();
-            if (ammo > 0)
-            {
-                currentClipAmmoAmount = ammo;
-                currentRemainedAmmoAmount -= ammo;
-                OnNewShotReady();
-            }
-        }
-
-        private int GetAvailableForReloadAmmo()
-        {
-            int remainedAmmo = currentClipAmmoAmount;
-            int need = weaponParameters.clipAmmoAmount - currentClipAmmoAmount;
-            int available = Mathf.Min(currentRemainedAmmoAmount, weaponParameters.clipAmmoAmount);
-            return Mathf.Min(available, need);
-        }
-
-        public void EjectShell()
-        {
-            // shell spawn and ejection
-            Transform shell = Instantiate(shellPrefab, ejector.position, Quaternion.LookRotation(ejector.right, ejector.up));
-            Rigidbody shellRigidbody = shell.GetComponent<Rigidbody>();
-            shellRigidbody.velocity = shellInitialVelocityMultiplier * shellRigidbody.mass * ejector.forward +
-                                      (isEquippedByPlayer ? controller.GetVelocity() : Vector3.zero);
-            shellRigidbody.angularVelocity =
-                Random.onUnitSphere * shellRigidbody.mass * shellInitialAngularVelocityMultiplier;
-        }
-
 
         private bool CanFire()
         {
@@ -202,10 +147,150 @@ namespace Weapons
         }
 
 
+        private void UpdateShooting()
+        {
+            if (!selected)
+                return;
+            timePerShot = 1 / weaponParameters.shootRate;
+
+            if (currentTimePerShot > 0)
+                currentTimePerShot -= Time.deltaTime;
+            if (currentReloadTime > 0)
+                currentReloadTime -= Time.deltaTime;
+        }
+
+        private void UpdateReloading()
+        {
+            if (selected)
+            {
+                int ammoForReload = GetAmmoAmountForReload();
+                if (currentReloadTime <= 0 && currentClipAmmoAmount <= 0 && ammoForReload > 0)
+                {
+                    Reload();
+                }
+
+                if (currentReloadTime > 0)
+                {
+                    currentReloadTime -= Time.deltaTime;
+                    if (currentReloadTime <= 0)
+                    {
+                        currentClipAmmoAmount += ammoForReload;
+                        currentRemainedAmmoAmount -= ammoForReload;
+                    }
+                }
+            }
+            else
+            {
+                if (currentReloadTime > 0)
+                    currentReloadTime = weaponParameters.reloadTime;
+            }
+        }
+
+        private void UpdateShutter()
+        {
+            
+            if (!shutter || currentShutterTime <= float.Epsilon)
+                return;
+            
+            currentShutterTime -= Time.deltaTime;
+            
+            switch (currentShutterState)
+            {
+                case ShutterState.Idle:
+                {
+                    // do nothing
+                    break;
+                }
+                    
+                case ShutterState.Sliding:
+                {
+                    float t = (shutterParameters.slideTime - currentShutterTime) / shutterParameters.slideTime;
+                    if (t > 1)
+                    {
+                        t = 1;
+                        currentShutterState = ShutterState.Delay;
+                        currentShutterTime = shutterParameters.delayAtSlidedPosition;
+                        SpawnShell();
+                        /*
+                         * TODO: spawn shell
+                         */
+                    }
+                    
+                    Vector3 farPosition = shutterInitialPosition + Vector3.back * shutterParameters.slideDistance;
+                    Vector3 position = Vector3.Lerp(shutterInitialPosition, farPosition, t);
+                    shutter.localPosition = position;
+                    
+                        
+                    break;
+                }
+                case ShutterState.Delay:
+                {
+                    // waiting
+                    if (currentShutterTime <= 0)
+                    {
+                        currentShutterTime = shutterParameters.slideBackTime;
+                        currentShutterState = ShutterState.SlidingBack;
+                        
+                    }
+
+                    break;
+                }
+                case ShutterState.SlidingBack:
+                {
+                    //same as sliding, but different values
+                    float t = (shutterParameters.slideBackTime - currentShutterTime) / shutterParameters.slideBackTime;
+                    if (t > 1)
+                    {
+                        t = 1;
+                        currentShutterState = ShutterState.Idle;
+                        currentShutterTime = shutterParameters.delayAtSlidedPosition;
+                    }
+                    
+                    Vector3 farPosition = shutterInitialPosition + Vector3.back * shutterParameters.slideDistance;
+                    Vector3 position = Vector3.Lerp(farPosition, shutterInitialPosition, t);
+                    shutter.localPosition = position;
+                    
+                    break;
+                }
+                    
+            }
+        }
+
+        private void SpawnShell()
+        {
+            Vector3 velocityDirection = ejector.forward;
+            float velocityMultiplier =
+                Random.value * (ejectorParameters.shellMaximumVelocity - ejectorParameters.shellMinimumVelocity) +
+                ejectorParameters.shellMinimumVelocity;
+            float angularVelocityMultiplier  = Random.value * (ejectorParameters.shellMaximumAngularVelocity - ejectorParameters.shellMinimumAngularVelocity) +
+                                              ejectorParameters.shellMinimumAngularVelocity;
+
+            Transform shellTransform = Instantiate(shell, ejector.position, Quaternion.LookRotation(ejector.right));
+            Rigidbody shellRigidbody = shellTransform.GetComponent<Rigidbody>();
+            shellRigidbody.velocity = velocityDirection * velocityMultiplier;
+            // TODO: research angularVelocity
+            shellRigidbody.angularVelocity = Random.insideUnitSphere * angularVelocityMultiplier;
+        }
+
+        private void UpdateTrigger()
+        {
+        }
+
+
+        private int GetAmmoAmountForReload()
+        {
+            int need = weaponParameters.clipAmmoAmount - currentClipAmmoAmount;
+            int available = Mathf.Min(currentRemainedAmmoAmount, weaponParameters.clipAmmoAmount);
+            return Mathf.Min(available, need);
+        }
+
+
         private void OnDrawGizmos()
         {
-            // draw muzzle position and try to raycast
+            const int gizmoShellEjectionTrajectorySamples = 20;
 
+            // draw muzzle position and try to raycast
+            // bots will fairly aim weapon to player
             if (muzzle)
             {
                 Gizmos.color = Color.red;
@@ -217,9 +302,6 @@ namespace Weapons
                 {
                     Gizmos.DrawLine(position, hit.point);
                     Gizmos.DrawSphere(hit.point, 0.0625f);
-                    // draw normal
-                    // Gizmos.DrawLine(hit.point, hit.point + hit.normal);
-                    // draw possible ricochet direction
                     if (hit.collider.gameObject.tag.Equals(Settings.Tags.Ricochetable))
                     {
                         Vector3 ricochetedDirection = Quaternion.AngleAxis(180, hit.normal) * muzzle.forward * -1;
@@ -235,21 +317,37 @@ namespace Weapons
             // draw ejector position and direction
             if (ejector)
             {
-                Gizmos.color = Color.green;
-
-                Vector3 position = ejector.position;
-                Vector3 velocity = ejector.forward * shellInitialVelocityMultiplier;
-                float samplesInverted = 1.0f / gizmoShellEjectionTrajectorySamples;
-
-                Gizmos.DrawSphere(position, 0.03125f);
-
-                while (position.y + 1 > transform.position.y)
+                for (int i = 0; i < gizmoShellEjectionTrajectorySamples; i++)
                 {
-                    Vector3 nextPosition = position + velocity * samplesInverted;
-                    Gizmos.DrawLine(position, nextPosition);
-                    velocity += Physics.gravity * samplesInverted;
-                    position = nextPosition;
+                    float t = (float) (i + 1) / gizmoShellEjectionTrajectorySamples;
+                    float velocity = Mathf.Lerp(ejectorParameters.shellMinimumVelocity,
+                        ejectorParameters.shellMaximumVelocity, t);
+                    Color color = new Color(1 - t, t, 0).Normalize();
+                    Gizmos.color = color;
+                    DrawTrajectoryGizmo(ejector.position, ejector.forward, velocity);
                 }
+            }
+
+            if (shutter)
+            {
+                Gizmos.DrawMesh(shutter.GetComponent<MeshFilter>().sharedMesh,
+                    shutter.position + shutter.forward * -1 * shutterParameters.slideDistance, shutter.rotation);
+            }
+        }
+
+        private void DrawTrajectoryGizmo(Vector3 point, Vector3 direction, float velocityMultiplier, int samples = 50)
+        {
+            Vector3 position = ejector.position;
+            Vector3 velocity = direction * velocityMultiplier;
+
+            float samplesInverted = 1.0f / samples;
+
+            while (position.y + 1.0f > point.y)
+            {
+                Vector3 nextPosition = position + velocity * samplesInverted;
+                Gizmos.DrawLine(position, nextPosition);
+                velocity += Physics.gravity * samplesInverted;
+                position = nextPosition;
             }
         }
     }

@@ -9,11 +9,6 @@ namespace AI
     [RequireComponent(typeof(NavMeshAgent))]
     public class AiAgent : MonoBehaviour
     {
-        private enum RotationMode
-        {
-            HeadRules = 0,
-            BodyRules,
-        }
 
         // TODO: regroup parameters
         public Transform testPoint;

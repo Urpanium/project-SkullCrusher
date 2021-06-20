@@ -63,7 +63,7 @@ namespace Character
 
         private Vector3 velocity;
 
-        private InputManagerOld inputManager;
+        private InputManager inputManager;
 
         private bool isGroundedInPreviousFrame;
 
@@ -80,7 +80,7 @@ namespace Character
 
         void Start()
         {
-            inputManager = GameObject.Find(Settings.GameObjects.GlobalController).GetComponent<InputManagerOld>();
+            inputManager = GameObject.Find(Settings.GameObjects.GlobalController).GetComponent<InputManager>();
 
             rigidbody = GetComponent<Rigidbody>();
             collider = GetComponent<CapsuleCollider>();
@@ -108,7 +108,7 @@ namespace Character
 
         private void MoveControl(Vector3 input)
         {
-            Vector3 accelerateDirection = GetMovementDirection(input);
+            Vector3 accelerateDirection = GetMovementDirection(input.normalized);
 
             Vector3 groundNormal;
             Vector3 groundPosition;

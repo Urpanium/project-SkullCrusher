@@ -7,7 +7,7 @@ namespace UI
 {
     public class ClipAmmoText : MonoBehaviour
     {
-        public WeaponManager playerWeaponManager;
+        public WeaponController weaponController;
 
         private Text text;
 
@@ -18,7 +18,7 @@ namespace UI
 
         private void Update()
         {
-            Weapon currentWeapon = playerWeaponManager.GetCurrentWeapon();
+            Weapon currentWeapon = weaponController.GetMainWeapon();
             if (currentWeapon)
                 text.text = currentWeapon.currentClipAmmoAmount + "/" +
                             currentWeapon.currentRemainedAmmoAmount;

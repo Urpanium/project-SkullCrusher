@@ -1,7 +1,7 @@
+using Damages;
 using Preferences;
 using UnityEngine;
 using UnityEngine.UI;
-using Weapons;
 
 namespace UI
 {
@@ -15,11 +15,13 @@ namespace UI
         {
             playerDamageableObject = GameObject.FindGameObjectWithTag(Settings.Tags.Player).GetComponent<DamageableObject>();
             text = GetComponent<Text>();
-            maxHealth = playerDamageableObject.health;
+            maxHealth = playerDamageableObject.GetHealth();
         }
 
         void Update()
         {
+            if(!playerDamageableObject)
+                return;
             text.text = playerDamageableObject.health + "/" + maxHealth;
         }
     }

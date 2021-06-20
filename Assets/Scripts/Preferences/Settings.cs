@@ -2,6 +2,18 @@
 {
     public static class Settings
     {
+
+        public static class Config
+        {
+            /*
+             * 1. Rifle
+             * 2. Machine Gun
+             * 3. Laser
+             * 4. Shotgun
+             * 5. Bazooka
+             */
+            public const int weaponSlotsCount = 5;
+        }
         public static class Tags
         {
             public const string Player = "Player";
