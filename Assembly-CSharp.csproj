@@ -59,13 +59,8 @@
      <Compile Include="Assets\Scripts\PostProcessing\ImageEffect.cs" />
      <Compile Include="Assets\Scripts\Damages\Classes\DamageModificator.cs" />
      <Compile Include="Assets\Scripts\Util\Gravity.cs" />
-     <Compile Include="Assets\Scripts\Weapons\Classes\BulletParameters.cs" />
-     <Compile Include="Assets\Scripts\Debug\EscapeHidePointer.cs" />
      <Compile Include="Assets\Scripts\Weapons\Classes\EjectorParameters.cs" />
-     <Compile Include="Assets\Scripts\Weapons\Classes\MuzzleParameters.cs" />
-     <Compile Include="Assets\Scripts\Weapons\Classes\ShutterParameters.cs" />
-     <Compile Include="Assets\Scripts\Weapons\Classes\TriggerParameters.cs" />
-     <Compile Include="Assets\Scripts\Weapons\Classes\WeaponParameters.cs" />
+     <Compile Include="Assets\Scripts\Debug\EscapeHidePointer.cs" />
      <Compile Include="Assets\Scripts\Weapons\Weapon.cs" />
      <Compile Include="Assets\Scripts\Level\HoldableObject.cs" />
      <Compile Include="Assets\Scripts\Util\ColorUtil.cs" />
@@ -73,24 +68,35 @@
      <Compile Include="Assets\Scripts\UI\ClipAmmoText.cs" />
      <Compile Include="Assets\Scripts\Weapons\Bullet.cs" />
      <Compile Include="Assets\Scripts\Damages\DamageableGroup.cs" />
+     <Compile Include="Assets\Scripts\Level\Covers\Util\Line.cs" />
      <Compile Include="Assets\Scripts\Damages\Enums\DamageType.cs" />
      <Compile Include="Assets\Scripts\IK\ManualIK.cs" />
+     <Compile Include="Assets\Scripts\Level\Covers\CoverType.cs" />
      <Compile Include="Assets\Scripts\Debug\VelocityText.cs" />
      <Compile Include="Assets\Scripts\UI\HealthText.cs" />
      <Compile Include="Assets\Scripts\AI\AiAgent.cs" />
+     <Compile Include="Assets\Scripts\Weapons\Enums\ShutterState.cs" />
      <Compile Include="Assets\Scripts\SingleInstance\InputManager.cs" />
+     <Compile Include="Assets\Scripts\Weapons\Classes\ShutterParameters.cs" />
      <Compile Include="Assets\Scripts\Damages\Classes\Damage.cs" />
      <Compile Include="Assets\Scripts\AI\HumanAiLogic.cs" />
+     <Compile Include="Assets\Scripts\Weapons\Classes\WeaponParameters.cs" />
      <Compile Include="Assets\Scripts\Weapons\Ammo.cs" />
+     <Compile Include="Assets\Scripts\Level\Covers\Cover.cs" />
      <Compile Include="Assets\Scripts\Debug\TimeControl.cs" />
      <Compile Include="Assets\Scripts\Character\GlitchCameraSynchronizer.cs" />
      <Compile Include="Assets\Scripts\Damages\DamageableObjectPart.cs" />
+     <Compile Include="Assets\Scripts\Weapons\Classes\BulletParameters.cs" />
      <Compile Include="Assets\Scripts\Debug\StringBasedColor.cs" />
+     <Compile Include="Assets\Scripts\Weapons\Classes\TriggerParameters.cs" />
      <Compile Include="Assets\Scripts\Util\Vector3Util.cs" />
      <Compile Include="Assets\Scripts\Character\CameraZoom.cs" />
      <Compile Include="Assets\Scripts\Character\WeaponController.cs" />
+     <Compile Include="Assets\Scripts\Weapons\Classes\MuzzleParameters.cs" />
+     <Compile Include="Assets\Scripts\Level\Covers\CoverBaker.cs" />
      <Compile Include="Assets\Scripts\Preferences\Settings.cs" />
-     <Compile Include="Assets\Scripts\Weapons\Enums\ShutterState.cs" />
+     <Compile Include="Assets\Scripts\Level\Covers\CoverList.cs" />
+     <Compile Include="Assets\Scripts\Level\Covers\CoverManager.cs" />
      <None Include="Assets\Shaders\PostProcessing\ArtifactImageEffect.shader" />
      <None Include="Assets\Scripts\Level\readme.txt" />
      <None Include="Assets\Shaders\Surface Diffuse.shader" />
@@ -715,6 +721,8 @@
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Users/maksi/Desktop/Projects/Unity/project-SkullCrusher/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
  </Reference>
+  </ItemGroup>
+  <ItemGroup>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

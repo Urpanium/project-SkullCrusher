@@ -311,7 +311,6 @@ namespace Character
 
         private bool IsGrounded(out Vector3 groundNormal, out Vector3 hitPoint)
         {
-            //TODO: remove hitPoint in future if it will be redundant 
             groundNormal = Vector3.down;
             hitPoint = Vector3.zero;
             RaycastHit[] hits = new RaycastHit[maxCollisionsHandle];

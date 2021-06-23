@@ -14,7 +14,7 @@ namespace SingleInstance
         public LayerMask shootableMask;
         public float bulletTimeout = 10.0f;
 
-        // store bullets as childs of object for convenience
+        // store bullets as children of object for convenience
         private Transform bulletsTransform;
         private List<Bullet> bullets;
 
@@ -29,7 +29,6 @@ namespace SingleInstance
 
         private void Update()
         {
-            //TODO: update bullets
             for (int i = 0; i < bullets.Count; i++)
             {
                 Bullet bullet = bullets[i];
