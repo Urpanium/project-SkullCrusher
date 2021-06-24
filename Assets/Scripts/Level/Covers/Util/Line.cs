@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.NetworkInformation;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -9,6 +10,8 @@ namespace Level.Covers.Util
     {
         public Vector3 point1;
         public Vector3 point2;
+
+        public float Length => Vector3.Distance(point1, point2);
 
         public Line(Vector3 point1, Vector3 point2)
         {
@@ -22,6 +25,32 @@ namespace Level.Covers.Util
             return Vector3.Distance(point1, point) < epsilon ||
                    Vector3.Distance(point2, point) < epsilon;
         }
+
+        public bool LineInside(Line other, float epsilon = 0.01f)
+        {
+            float point1 = PointOnLine(this, other.point1);
+            float point2 = PointOnLine(this, other.point2);
+
+            return Length > other.Length && point1 * point2 > 1 - epsilon;
+        }
+
+        public bool LineSemiInside(Line other, float epsilon = 0.01f)
+        {
+            float point1 = PointOnLine(this, other.point1);
+            float point2 = PointOnLine(this, other.point2);
+            return point1 * point2 > 1 - epsilon;
+        }
+
+        private float PointOnLine(Line line, Vector3 testPoint)
+        {
+            Vector3 direction1 = (line.point2 - line.point1).normalized;
+            Vector3 direction2 = (testPoint - line.point1).normalized;
+            float dot = Vector3.Dot(direction1, direction2);
+            return Mathf.Abs(dot);
+        }
+        
+        
+        
 
         public void ChangePoint(Vector3 original, Vector3 newValue, float epsilon = 0.01f)
         {

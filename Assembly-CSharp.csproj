@@ -73,6 +73,7 @@
      <Compile Include="Assets\Scripts\IK\ManualIK.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\CoverType.cs" />
      <Compile Include="Assets\Scripts\Debug\VelocityText.cs" />
+     <Compile Include="Assets\Scripts\Level\Covers\SerializableCoverList.cs" />
      <Compile Include="Assets\Scripts\UI\HealthText.cs" />
      <Compile Include="Assets\Scripts\AI\AiAgent.cs" />
      <Compile Include="Assets\Scripts\Weapons\Enums\ShutterState.cs" />
@@ -87,6 +88,7 @@
      <Compile Include="Assets\Scripts\Character\GlitchCameraSynchronizer.cs" />
      <Compile Include="Assets\Scripts\Damages\DamageableObjectPart.cs" />
      <Compile Include="Assets\Scripts\Weapons\Classes\BulletParameters.cs" />
+     <Compile Include="Assets\Scripts\Level\Covers\CoverManager.cs" />
      <Compile Include="Assets\Scripts\Debug\StringBasedColor.cs" />
      <Compile Include="Assets\Scripts\Weapons\Classes\TriggerParameters.cs" />
      <Compile Include="Assets\Scripts\Util\Vector3Util.cs" />
@@ -95,8 +97,6 @@
      <Compile Include="Assets\Scripts\Weapons\Classes\MuzzleParameters.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\CoverBaker.cs" />
      <Compile Include="Assets\Scripts\Preferences\Settings.cs" />
-     <Compile Include="Assets\Scripts\Level\Covers\CoverList.cs" />
-     <Compile Include="Assets\Scripts\Level\Covers\CoverManager.cs" />
      <None Include="Assets\Shaders\PostProcessing\ArtifactImageEffect.shader" />
      <None Include="Assets\Scripts\Level\readme.txt" />
      <None Include="Assets\Shaders\Surface Diffuse.shader" />

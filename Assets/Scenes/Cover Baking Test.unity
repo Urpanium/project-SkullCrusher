@@ -1108,18 +1108,173 @@ MonoBehaviour:
   m_GameObject: {fileID: 736832425}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f4fbb627dbe4842b21a2d1beca1b7be, type: 3}
+  m_Script: {fileID: 11500000, guid: 20acf43e45744cdc919366ed9cef0c11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   shootableMask:
     serializedVersion: 2
-    m_Bits: 4294967295
-  lineMergeEpsilon: 0.1
-  maximumLineMergeIterations: 6
-  linePointsEpsilon: 0.01
+    m_Bits: 1
+  coverSetName: HumanCoverSet
   characterStandHeight: 2
   characterCrouchHeight: 1
   characterRadius: 0.25
+  covers:
+  - position: {x: 2.4166667, y: 1.0416667, z: -8.25}
+    direction: {x: -0, y: -0, z: 1}
+    type: 1
+  - position: {x: 2.9166667, y: 1.0416667, z: -8.25}
+    direction: {x: -0, y: -0, z: 1}
+    type: 1
+  - position: {x: 6.916667, y: 1.0416667, z: -8.25}
+    direction: {x: 0.794358, y: -0, z: 0.6074499}
+    type: 1
+  - position: {x: 7.2203918, y: 1.0416667, z: -8.647179}
+    direction: {x: 0.794358, y: -0, z: 0.6074499}
+    type: 1
+  - position: {x: 7.524117, y: 1.0416667, z: -9.044358}
+    direction: {x: 0.794358, y: -0, z: 0.6074499}
+    type: 1
+  - position: {x: 9.583334, y: 1.0416667, z: -9.583334}
+    direction: {x: -0.70710677, y: -0, z: 0.70710677}
+    type: 0
+  - position: {x: 9.584468, y: 1.0416667, z: -9.006803}
+    direction: {x: -0.986394, y: -0, z: -0.16439837}
+    type: 0
+  - position: {x: 9.583334, y: 1.0416667, z: -9}
+    direction: {x: -0.986394, y: -0, z: -0.16439837}
+    type: 0
+  - position: {x: 9.75, y: 1.0416667, z: -9.333333}
+    direction: {x: -1, y: 0, z: -0}
+    type: 0
+  - position: {x: 9.583334, y: 1.0416667, z: -9}
+    direction: {x: -0.7949512, y: -0, z: -0.6066733}
+    type: 0
+  - position: {x: 8.976661, y: 1.0416667, z: -8.205049}
+    direction: {x: -0.7949512, y: -0, z: -0.6066733}
+    type: 0
+  - position: {x: 8.673324, y: 1.0416667, z: -7.8075733}
+    direction: {x: -0.7949512, y: -0, z: -0.6066733}
+    type: 1
+  - position: {x: 8.3699875, y: 1.0416667, z: -7.4100976}
+    direction: {x: -0.7949512, y: -0, z: -0.6066733}
+    type: 1
+  - position: {x: 8.06665, y: 1.0416667, z: -7.012622}
+    direction: {x: -0.7949512, y: -0, z: -0.6066733}
+    type: 1
+  - position: {x: 7.7633142, y: 1.0416667, z: -6.6151466}
+    direction: {x: -0.7949512, y: -0, z: -0.6066733}
+    type: 1
+  - position: {x: 7.459977, y: 1.0416667, z: -6.217671}
+    direction: {x: -0.7949512, y: -0, z: -0.6066733}
+    type: 1
+  - position: {x: 1.8333334, y: 1.0416667, z: -6.75}
+    direction: {x: 0.7071063, y: -0, z: -0.7071073}
+    type: 1
+  - position: {x: 1.8333334, y: 1.0416667, z: -8.166666}
+    direction: {x: 0.7071073, y: -0, z: 0.7071063}
+    type: 1
+  - position: {x: 1.75, y: 1.0416667, z: -7.333333}
+    direction: {x: 1, y: -0, z: 0}
+    type: 1
+  - position: {x: 1.75, y: 1.0416667, z: -7.833333}
+    direction: {x: 1, y: -0, z: 0}
+    type: 1
+  - position: {x: 3.2083335, y: 1.0416667, z: -6.7916665}
+    direction: {x: -0.70710677, y: -0, z: -0.70710677}
+    type: 1
+  - position: {x: 5.916667, y: 1.0416667, z: -6.7916665}
+    direction: {x: 1, y: -0, z: 0}
+    type: 1
+  - position: {x: 6.216667, y: 1.0416667, z: -7.3166666}
+    direction: {x: 0.8000001, y: -0, z: 0.59999996}
+    type: 1
+  - position: {x: 6.516667, y: 1.0416667, z: -7.7166667}
+    direction: {x: 0.8000001, y: -0, z: 0.59999996}
+    type: 1
+  - position: {x: 6.816667, y: 1.0416667, z: -8.116667}
+    direction: {x: 0.8000001, y: -0, z: 0.59999996}
+    type: 1
+  - position: {x: 6.916667, y: 1.0416667, z: -8.25}
+    direction: {x: 0.8000001, y: -0, z: 0.59999996}
+    type: 1
+  - position: {x: 3.25, y: 1.0416667, z: -8.166666}
+    direction: {x: -0.7071073, y: -0, z: 0.7071063}
+    type: 1
+  - position: {x: 3.3333335, y: 1.0416667, z: -7.583333}
+    direction: {x: -1, y: -0, z: 0}
+    type: 1
+  - position: {x: 3.3333335, y: 1.0416667, z: -7.083333}
+    direction: {x: -1, y: -0, z: 0}
+    type: 1
+  - position: {x: 2.5833335, y: 1.0416667, z: -6.6666665}
+    direction: {x: -0, y: -0, z: -1}
+    type: 1
+  - position: {x: 2.0833335, y: 1.0416667, z: -6.6666665}
+    direction: {x: -0, y: -0, z: -1}
+    type: 1
+  - position: {x: 6.4633636, y: 1.0416667, z: -6.1696696}
+    direction: {x: 0.6726729, y: -0, z: -0.73994}
+    type: 1
+  - position: {x: 6.0933933, y: 1.0416667, z: -6.506006}
+    direction: {x: 0.6726729, y: -0, z: -0.73994}
+    type: 1
+  - position: {x: 7, y: 1.0416667, z: -5.833333}
+    direction: {x: -0, y: -0, z: -1}
+    type: 1
+  - position: {x: 4.166667, y: 1.0416667, z: -4.25}
+    direction: {x: -0, y: -0, z: 1}
+    type: 0
+  - position: {x: 2.0833335, y: 1.0416667, z: -1.7499995}
+    direction: {x: 0.7071073, y: -0, z: -0.7071063}
+    type: 0
+  - position: {x: 2, y: 1.0416667, z: -3.833333}
+    direction: {x: 1, y: -0, z: 0}
+    type: 0
+  - position: {x: 4.5, y: 1.0416667, z: -4.1666665}
+    direction: {x: -0.70710784, y: -0, z: 0.7071058}
+    type: 0
+  - position: {x: 7.416667, y: 1.0416667, z: -3.25}
+    direction: {x: -0, y: -0, z: 1}
+    type: 1
+  - position: {x: 7.916667, y: 1.0416667, z: -3.25}
+    direction: {x: -0, y: -0, z: 1}
+    type: 1
+  - position: {x: 6.8333335, y: 1.0416667, z: -3.1666665}
+    direction: {x: 0.70710677, y: -0, z: 0.70710677}
+    type: 1
+  - position: {x: 4.4583335, y: 1.0416667, z: -1.791666}
+    direction: {x: -0.70710677, y: -0, z: -0.70710677}
+    type: 0
+  - position: {x: 6.8333335, y: 1.0416667, z: -1.7499995}
+    direction: {x: 0.70710677, y: -0, z: -0.70710677}
+    type: 1
+  - position: {x: 6.75, y: 1.0416667, z: -2.333333}
+    direction: {x: 1, y: -0, z: 0}
+    type: 1
+  - position: {x: 6.75, y: 1.0416667, z: -2.833333}
+    direction: {x: 1, y: -0, z: 0}
+    type: 1
+  - position: {x: 8.25, y: 1.0416667, z: -3.1666665}
+    direction: {x: -0.70710677, y: -0, z: 0.70710677}
+    type: 1
+  - position: {x: 8.208334, y: 1.0416667, z: -1.791666}
+    direction: {x: -0.70710677, y: -0, z: -0.70710677}
+    type: 1
+  - position: {x: 8.333334, y: 1.0416667, z: -2.583333}
+    direction: {x: -1, y: -0, z: 0}
+    type: 1
+  - position: {x: 8.333334, y: 1.0416667, z: -2.083333}
+    direction: {x: -1, y: -0, z: 0}
+    type: 1
+  - position: {x: 7.583334, y: 1.0416667, z: -1.666666}
+    direction: {x: -0, y: -0, z: -1}
+    type: 1
+  - position: {x: 7.083334, y: 1.0416667, z: -1.666666}
+    direction: {x: -0, y: -0, z: -1}
+    type: 1
+  - position: {x: 2.3333335, y: 1.0416667, z: -1.666666}
+    direction: {x: -0, y: -0, z: -1}
+    type: 0
 --- !u!4 &736832427
 Transform:
   m_ObjectHideFlags: 0

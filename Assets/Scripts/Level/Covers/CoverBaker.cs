@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Level.Covers.Util;
+using Unity.Jobs;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 using Util;
@@ -8,28 +11,41 @@ namespace Level.Covers
 {
     public class CoverBaker
     {
-        public LayerMask shootableMask;
+        private readonly LayerMask shootableMask;
 
-        /*[Range(0, 90.0f)] public float mergeAngle = 0.01f;
-        [Range(0, 20)] public int maximumLineMergeIterations = 4;*/
-        
-        [Header("Character Settings")] public float characterStandHeight = 2.0f;
-        public float characterCrouchHeight = 2.0f;
-        public float characterRadius = 0.25f;
+        private readonly float characterStandHeight;
+        private readonly float characterCrouchHeight;
+        private readonly float characterRadius;
 
-        private float linePointsEpsilon = 0.01f;
-        
-        // TODO: use jobs system?
+        private static readonly float linePointsEpsilon = 0.01f;
+
+        private int progressId;
+
+
+
+        public CoverBaker(LayerMask shootableMask, float characterStandHeight, float characterCrouchHeight,
+            float characterRadius)
+        {
+            this.shootableMask = shootableMask;
+            this.characterStandHeight = characterStandHeight;
+            this.characterCrouchHeight = characterCrouchHeight;
+            this.characterRadius = characterRadius;
+        }
+
 
         public List<Cover> BakeCovers()
         {
+            progressId = Progress.Start("Baking covers", "Finding spots to hide for AI agents...");
+            
             NavMeshTriangulation triangulation = NavMesh.CalculateTriangulation();
-
             Vector3[] vertices = triangulation.vertices;
             int[] triangles = triangulation.indices;
 
+            // STEP 1
             List<Line> allLines = TrianglesToLines(triangles, vertices);
+            // STEP 2
             List<Line> uniqueLines = GetUniqueLines(allLines);
+            // STEP 3
             List<Line> connectedLines = GetConnectedLines(uniqueLines);
 
             /*List<Line> mergedLines = connectedLines;
@@ -46,10 +62,12 @@ namespace Level.Covers
             }
 
             List<Line> lines = mergedLines;*/
-
+            // STEP 4
             List<(Vector3, Vector3)> possibleCovers = GetPossibleCoversPositionsAndDirections(connectedLines);
-            
-            return GetCovers(possibleCovers);
+            // STEP 5
+            List<Cover> covers = GetCovers(possibleCovers);
+            Progress.Remove(progressId);
+            return covers;
         }
 
         private List<Line> TrianglesToLines(int[] triangles, Vector3[] vertices)
@@ -131,13 +149,35 @@ namespace Level.Covers
             return result;
         }
 
+        private bool TryMergeLines(Line line1, Line line2, out Line newLine)
+        {
+            if (line1.HasSamePoints(line2))
+            {
+                (Vector3, Vector3, Vector3) points = line1.GetSameAndDifferentPoints(line2);
+
+                Vector3 direction1 = points.Item1 - points.Item2;
+                Vector3 direction2 = points.Item1 - points.Item3;
+                float dot = Vector3.Dot(direction1, direction2);
+                
+                if (Mathf.Abs(dot) > 0.95f)
+                {
+                    newLine = new Line(points.Item2, points.Item3);
+                    return true;
+                }
+            }
+            throw new NotImplementedException();
+        }
+
 
         private List<(Vector3, Vector3)> GetPossibleCoversPositionsAndDirections(List<Line> uniqueLines)
         {
+            Progress.Report(progressId, 0.0f);
             List<(Vector3, Vector3)> result = new List<(Vector3, Vector3)>();
 
             for (int i = 0; i < uniqueLines.Count; i++)
             {
+                Progress.Report(progressId, 0.5f * ((i + 1.0f) / uniqueLines.Count));
+
                 Line line = uniqueLines[i];
                 Vector3 delta = line.point2 - line.point1;
                 float length = delta.magnitude;
@@ -176,10 +216,12 @@ namespace Level.Covers
 
         private List<Cover> GetCovers(List<(Vector3, Vector3)> possibleCovers)
         {
+            Progress.Report(progressId, 0.5f);
             List<Cover> result = new List<Cover>();
             for (int i = 0; i < possibleCovers.Count; i++)
             {
                 // (position, direction)
+                Progress.Report(progressId, 0.5f + 0.5f * ((i + 1.0f) / possibleCovers.Count));
                 (Vector3, Vector3) possibleCover = possibleCovers[i];
                 if (TryMakeCover(possibleCover.Item1, possibleCover.Item2, out Cover cover))
                 {
@@ -189,7 +231,7 @@ namespace Level.Covers
 
             return result;
         }
-        
+
 
         private bool TryMakeCover(Vector3 positionOnNavMesh, Vector3 calculatedNormal,
             out Cover cover)
@@ -263,6 +305,5 @@ namespace Level.Covers
 
             return 0;
         }
-        
     }
 }
