@@ -89,9 +89,11 @@ namespace Level.Covers
         private (Vector3, Vector3) GetClusterBounds(int clusterId)
         {
             List<Cover> cluster = efficientCoverList[clusterId];
-            
+            if (cluster.Count <= 0)
+                return (Vector3.zero, Vector3.zero);
             Vector3 minBound = cluster[0].position;
             Vector3 maxBound = cluster[0].position;
+            
             
             for (int i = 1; i < cluster.Count; i++)
             {
