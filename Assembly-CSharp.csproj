@@ -53,6 +53,7 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\IK\IK.cs" />
+     <Compile Include="Assets\Scripts\Level\Covers\Debug\LineTest.cs" />
      <Compile Include="Assets\Scripts\SingleInstance\BulletManager.cs" />
      <Compile Include="Assets\Scripts\AI\AiPatrolPointSet.cs" />
      <Compile Include="Assets\Scripts\Character\Controller.cs" />
@@ -73,7 +74,7 @@
      <Compile Include="Assets\Scripts\IK\ManualIK.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\CoverType.cs" />
      <Compile Include="Assets\Scripts\Debug\VelocityText.cs" />
-     <Compile Include="Assets\Scripts\Level\Covers\SerializableCoverList.cs" />
+     <Compile Include="Assets\Scripts\Level\Covers\Util\SerializableCoverList.cs" />
      <Compile Include="Assets\Scripts\UI\HealthText.cs" />
      <Compile Include="Assets\Scripts\AI\AiAgent.cs" />
      <Compile Include="Assets\Scripts\Weapons\Enums\ShutterState.cs" />
@@ -83,7 +84,7 @@
      <Compile Include="Assets\Scripts\AI\HumanAiLogic.cs" />
      <Compile Include="Assets\Scripts\Weapons\Classes\WeaponParameters.cs" />
      <Compile Include="Assets\Scripts\Weapons\Ammo.cs" />
-     <Compile Include="Assets\Scripts\Level\Covers\Cover.cs" />
+     <Compile Include="Assets\Scripts\Level\Covers\Classes\Cover.cs" />
      <Compile Include="Assets\Scripts\Debug\TimeControl.cs" />
      <Compile Include="Assets\Scripts\Character\GlitchCameraSynchronizer.cs" />
      <Compile Include="Assets\Scripts\Damages\DamageableObjectPart.cs" />
@@ -95,8 +96,10 @@
      <Compile Include="Assets\Scripts\Character\CameraZoom.cs" />
      <Compile Include="Assets\Scripts\Character\WeaponController.cs" />
      <Compile Include="Assets\Scripts\Weapons\Classes\MuzzleParameters.cs" />
-     <Compile Include="Assets\Scripts\Level\Covers\CoverBaker.cs" />
+     <Compile Include="Assets\Scripts\Level\Covers\Classes\CoverBaker.cs" />
+     <Compile Include="Assets\Scripts\Level\Covers\Debug\NavMeshLinesVisualizer.cs" />
      <Compile Include="Assets\Scripts\Preferences\Settings.cs" />
+     <Compile Include="Assets\Scripts\Level\Covers\Classes\CoverClusterMaker.cs" />
      <None Include="Assets\Shaders\PostProcessing\ArtifactImageEffect.shader" />
      <None Include="Assets\Scripts\Level\readme.txt" />
      <None Include="Assets\Shaders\Surface Diffuse.shader" />

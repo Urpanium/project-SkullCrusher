@@ -30,27 +30,42 @@ namespace Level.Covers.Util
         {
             float point1 = PointOnLine(this, other.point1);
             float point2 = PointOnLine(this, other.point2);
+            if (point1 > 0 || point2 > 0)
+                return false;
 
             return Length > other.Length && point1 * point2 > 1 - epsilon;
         }
 
         public bool LineSemiInside(Line other, float epsilon = 0.01f)
         {
-            float point1 = PointOnLine(this, other.point1);
-            float point2 = PointOnLine(this, other.point2);
-            return point1 * point2 > 1 - epsilon;
+            Vector3 direction1 = (point1 - point2).normalized;
+            Vector3 direction2 = (other.point1 - other.point2).normalized;
+            
+            float dot = Vector3.Dot(direction1, direction2);
+            
+            if (dot * dot < 1 - epsilon)
+            {
+                return false;
+            }
+
+            float point1f = PointOnLine(this, other.point1);
+            float point2f = PointOnLine(this, other.point2);
+            /*if (point1 > 0 || point2 > 0)
+                return false;*/
+
+            return point1f * -1 > 1 - epsilon || point2f * -1 > 1 - epsilon;
         }
 
-        private float PointOnLine(Line line, Vector3 testPoint)
+        private static float PointOnLine(Line line, Vector3 testPoint)
         {
-            Vector3 direction1 = (line.point2 - line.point1).normalized;
-            Vector3 direction2 = (testPoint - line.point1).normalized;
+            Vector3 direction1 = (testPoint - line.point1).normalized;
+            Vector3 direction2 = (testPoint - line.point2).normalized;
+
             float dot = Vector3.Dot(direction1, direction2);
-            return Mathf.Abs(dot);
+
+            return dot;
         }
-        
-        
-        
+
 
         public void ChangePoint(Vector3 original, Vector3 newValue, float epsilon = 0.01f)
         {
