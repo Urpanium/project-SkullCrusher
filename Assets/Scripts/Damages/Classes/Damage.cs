@@ -1,4 +1,4 @@
-﻿using Weapons.Damages;
+﻿using Damages.Enums;
 
 namespace Damages
 {

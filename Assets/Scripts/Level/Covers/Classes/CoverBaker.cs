@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Level.Covers.Util;
+using Level.Covers.Classes;
+using Level.Covers.Classes.Util;
 using UnityEngine;
 using UnityEngine.AI;
 

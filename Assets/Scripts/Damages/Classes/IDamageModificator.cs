@@ -1,6 +1,4 @@
-﻿using Damages;
-
-namespace Weapons.Damages
+﻿namespace Damages.Classes
 {
     public interface IDamageModificator
     {

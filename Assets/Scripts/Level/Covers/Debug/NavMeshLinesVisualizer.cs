@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Level.Covers.Util;
+using Level.Covers.Classes.Util;
 using UnityEngine;
 using UnityEngine.AI;
 using Util;
@@ -61,7 +61,7 @@ namespace Level.Covers
             for (int i = 0; i < lines.Count; i++)
             {
                 Line line = lines[i];
-                Gizmos.color = ColorUtil.GetStringBasedColor(i.ToString());
+                Gizmos.color = ColorUtil.RandomColor(i);
                 Gizmos.DrawLine(line.point1, line.point2);
             }
         }

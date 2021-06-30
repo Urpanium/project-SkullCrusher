@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Net.NetworkInformation;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
-namespace Level.Covers.Util
+namespace Level.Covers.Classes.Util
 {
     [Serializable]
     public class Line

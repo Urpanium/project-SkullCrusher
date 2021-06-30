@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Level.Covers.Util
+namespace Level.Covers.Classes.Util
 {
     [Serializable]
     public class SerializableCoverList

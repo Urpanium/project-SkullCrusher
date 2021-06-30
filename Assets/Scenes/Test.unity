@@ -50361,29 +50361,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05ef99708acf00b4e8aa4197a2cfb8dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  state: 0
-  idleType: 0
-  instantContactVisibility: 1
-  contactStartVisibility: 0.2
-  chaseStartVisibility: 0.2
-  contactTime: 0.5
-  chaseTime: 20
-  searchTime: 40
-  searchPointChangeInterval: 0.5
-  searchAttemptsCount: 15
-  searchRadius: 20
-  coverSearchDistance: 10
-  coverSearchSamples: 5
-  coverMinThickness: 0.25
-  coverMaxThickness: 2
-  retreatDistance: 3
-  retreatSearchSamples: 10
-  recoveredContactMoveDelay: 0.3
-  coverLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  armPivot: {fileID: 902651145}
-  equippedWeapon: {fileID: 0}
 --- !u!114 &1011682578
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50396,24 +50373,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce63601ea5d740eb87f70bbdbfdafcd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testPoint: {fileID: 1375818561}
-  testRadius: 10
-  movementSpeed: 4
-  lookSpeed: 3
-  bodyRotationSpeed: 2
-  agentHeight: 2
-  sampleRadius: 15
-  visionAngle: 70
-  visionDistance: 50
-  visibleObjectsMask:
-    serializedVersion: 2
-    m_Bits: 1
-  maxNeckAngleDelta: 72
-  headTransform: {fileID: 902651145}
-  bodyTransform: {fileID: 1011682582}
-  onArrivedAtTargetPosition:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!195 &1011682579
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -75794,29 +75753,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05ef99708acf00b4e8aa4197a2cfb8dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  state: 0
-  idleType: 0
-  instantContactVisibility: 1
-  contactStartVisibility: 0.2
-  chaseStartVisibility: 0.2
-  contactTime: 0.5
-  chaseTime: 20
-  searchTime: 40
-  searchPointChangeInterval: 0.5
-  searchAttemptsCount: 15
-  searchRadius: 20
-  coverSearchDistance: 10
-  coverSearchSamples: 5
-  coverMinThickness: 0.25
-  coverMaxThickness: 2
-  retreatDistance: 3
-  retreatSearchSamples: 10
-  recoveredContactMoveDelay: 0.3
-  coverLayerMask:
-    serializedVersion: 2
-    m_Bits: 1
-  armPivot: {fileID: 927624114}
-  equippedWeapon: {fileID: 0}
 --- !u!114 &1668334604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -75829,24 +75765,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce63601ea5d740eb87f70bbdbfdafcd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testPoint: {fileID: 1375818561}
-  testRadius: 10
-  movementSpeed: 4
-  lookSpeed: 3
-  bodyRotationSpeed: 2
-  agentHeight: 2
-  sampleRadius: 15
-  visionAngle: 70
-  visionDistance: 50
-  visibleObjectsMask:
-    serializedVersion: 2
-    m_Bits: 1
-  maxNeckAngleDelta: 72
-  headTransform: {fileID: 927624114}
-  bodyTransform: {fileID: 1668334608}
-  onArrivedAtTargetPosition:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!195 &1668334605
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -83513,11 +83431,13 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   coverSetName: HumanCoverSet
+  drawCovers: 0
   characterStandHeight: 1.95
   characterCrouchHeight: 0.95
   characterRadius: 0.25
-  linePointsEpsilon: 0
-  lineMergeEpsilon: 0
+  clustersCount: 10
+  showClustersVolumes: 1
+  linePointsEpsilon: 0.01
 --- !u!114 &1892408949
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -92661,24 +92581,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce63601ea5d740eb87f70bbdbfdafcd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testPoint: {fileID: 2040329732}
-  testRadius: 10
-  movementSpeed: 1
-  lookSpeed: 1
-  bodyRotationSpeed: 2
-  agentHeight: 2
-  sampleRadius: 15
-  visionAngle: 100
-  visionDistance: 50
-  visibleObjectsMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  maxNeckAngleDelta: 72
-  headTransform: {fileID: 2040329732}
-  bodyTransform: {fileID: 0}
-  onArrivedAtTargetPosition:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!195 &2040329734
 NavMeshAgent:
   m_ObjectHideFlags: 0

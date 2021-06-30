@@ -7,7 +7,7 @@ namespace Debug
     {
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = ColorUtil.GetStringBasedColor(name);
+            Gizmos.color = ColorUtil.RandomColor(name);
             Gizmos.DrawCube(transform.position, Vector3.one);
         }
     }

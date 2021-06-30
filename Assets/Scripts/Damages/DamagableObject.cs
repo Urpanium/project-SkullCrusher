@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Damages.Classes;
 using UnityEngine;
 using UnityEngine.Events;
-using Weapons.Damages;
 
 namespace Damages
 {

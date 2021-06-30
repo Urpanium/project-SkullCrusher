@@ -14,9 +14,9 @@ namespace Util
             return color;
             
         }
-        public static Color GetStringBasedColor(string s)
+        public static Color RandomColor(object seed)
         {
-            int hashSeed = s.GetHashCode();
+            int hashSeed = seed.GetHashCode();
 
             Random random = new Random(hashSeed);
 

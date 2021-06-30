@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using Util;
-using Weapons.Damages;
 
 namespace Damages
 {
@@ -41,7 +40,7 @@ namespace Damages
                 return;
             if (!boxCollider)
                 boxCollider = GetComponent<BoxCollider>();
-            Gizmos.color = ColorUtil.GetStringBasedColor(damageableGroup.name);
+            Gizmos.color = ColorUtil.RandomColor(damageableGroup.name);
             DrawWireCubeGizmo(transform.position, transform.forward, transform.up, transform.right, boxCollider.size);
         }
 

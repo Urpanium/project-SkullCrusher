@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Level.Covers
+namespace Level.Covers.Classes
 {
     [Serializable]
     public class Cover

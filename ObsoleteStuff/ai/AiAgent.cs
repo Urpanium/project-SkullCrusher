@@ -76,10 +76,8 @@ namespace AI
 
         private void LookUpdate()
         {
-            // head always rules
             float neckDelta = GetNeckDelta();
             Vector3 targetLookDirection = targetLookPosition - headTransform.position;
-            //Vector3 targetLookDirection = headTransform.forward;
             if (neckDelta > maxNeckAngleDelta)
             {
                 // neck is about to break
@@ -110,14 +108,13 @@ namespace AI
             return (transform.position - targetMovePosition).magnitude < agentHeight;
         }
 
-        public bool IsLookedAtTarget()
+        public bool IsLookingAtTarget()
         {
             return (transform.forward - (targetLookPosition - transform.position)).magnitude < 0.01f;
         }
 
         public void StopMoving()
         {
-            //targetMovePosition = transform.position;
             GoTo(transform.position);
         }
 
@@ -130,7 +127,6 @@ namespace AI
         // returns possibility to move right into point
         public bool GoTo(Vector3 position)
         {
-            //rotationMode = RotationMode.BodyRules;
             NavMeshHit hit;
             if (NavMesh.SamplePosition(position, out hit, sampleRadius, -1))
             {
