@@ -1,6 +1,6 @@
 ﻿namespace AI.Enums
 {
-    public enum AiGroupRole
+    public enum AiBotGroupRole
     {
         Single = 0,
         Common,

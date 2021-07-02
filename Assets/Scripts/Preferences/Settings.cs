@@ -30,6 +30,7 @@
         public static class GameObjects
         {
             public const string GlobalController = "Global Controller";
+            public const string Player = "Player";
         }
 
     }

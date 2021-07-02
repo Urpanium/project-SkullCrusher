@@ -52,64 +52,91 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\AI\Classes\States\Configs\AiStateConfig.cs" />
      <Compile Include="Assets\Scripts\IK\IK.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\Debug\LineTest.cs" />
      <Compile Include="Assets\Scripts\SingleInstance\BulletManager.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\Configs\AttackStateConfig.cs" />
      <Compile Include="Assets\Scripts\Character\Controller.cs" />
      <Compile Include="Assets\Scripts\PostProcessing\ImageEffect.cs" />
      <Compile Include="Assets\Scripts\Damages\Classes\IDamageModificator.cs" />
      <Compile Include="Assets\Scripts\Util\Gravity.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\SearchState.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\HelpState.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\HideState.cs" />
      <Compile Include="Assets\Scripts\Weapons\Classes\EjectorParameters.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\ContactState.cs" />
      <Compile Include="Assets\Scripts\Debug\EscapeHidePointer.cs" />
+     <Compile Include="Assets\Scripts\AI\Enums\IdleStateType.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\ChaseState.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\Configs\ContactStateConfig.cs" />
+     <Compile Include="Assets\Scripts\AI\Scriptables\AiBotConfig.cs" />
+     <Compile Include="Assets\Scripts\AI\Enums\AiBotGroupRole.cs" />
      <Compile Include="Assets\Scripts\Weapons\Weapon.cs" />
      <Compile Include="Assets\Scripts\Level\HoldableObject.cs" />
+     <Compile Include="Assets\Scripts\AI\AiManager.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\Groups\GroupRoles\AiGroupRole.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\AttackState.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\Groups\GroupRoles\Configs\RearAttackerRoleConfig.cs" />
      <Compile Include="Assets\Scripts\Util\ColorUtil.cs" />
      <Compile Include="Assets\Scripts\Damages\DamagableObject.cs" />
      <Compile Include="Assets\Scripts\UI\ClipAmmoText.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\Groups\AiGroup.cs" />
      <Compile Include="Assets\Scripts\Weapons\Bullet.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\Configs\RearAttackStateConfig.cs" />
      <Compile Include="Assets\Scripts\Damages\DamageableGroup.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\Classes\Util\Line.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\Classes\Util\BinarySerialization\CoverData.cs" />
      <Compile Include="Assets\Scripts\Damages\Enums\DamageType.cs" />
      <Compile Include="Assets\Scripts\IK\ManualIK.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\TakeCoverState.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\Enums\CoverType.cs" />
-     <Compile Include="Assets\Scripts\AI\AiControl.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\Configs\IdleStateConfig.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\Configs\HideStateConfig.cs" />
+     <Compile Include="Assets\Scripts\AI\AiController.cs" />
+     <Compile Include="Assets\Scripts\AI\Enums\AiBotState.cs" />
      <Compile Include="Assets\Scripts\Debug\VelocityText.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\Classes\Util\SerializableCoverList.cs" />
      <Compile Include="Assets\Scripts\UI\HealthText.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\Configs\SearchStateConfig.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\Groups\GroupRoles\Configs\TankRoleConfig.cs" />
      <Compile Include="Assets\Scripts\Weapons\Enums\ShutterState.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\Groups\GroupRoles\Configs\TankSupporterRoleConfig.cs" />
      <Compile Include="Assets\Scripts\SingleInstance\InputManager.cs" />
      <Compile Include="Assets\Scripts\Weapons\Classes\ShutterParameters.cs" />
      <Compile Include="Assets\Scripts\Damages\Classes\Damage.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\Configs\TakeCoverStateConfig.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\Classes\CoverClusterMaker.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\RearAttackState.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\Debug\ClusterTest.cs" />
      <Compile Include="Assets\Scripts\Weapons\Ammo.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\Classes\Util\BinarySerialization\BinarySerializableCoverList.cs" />
      <Compile Include="Assets\Scripts\Weapons\Classes\WeaponParameters.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\Classes\Cover.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\Configs\ChaseStateConfig.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\Groups\GroupRoles\Configs\SingleRoleConfig.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\Groups\GroupRoles\Configs\RoleConfig.cs" />
      <Compile Include="Assets\Scripts\Debug\TimeControl.cs" />
      <Compile Include="Assets\Scripts\Character\GlitchCameraSynchronizer.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\Classes\Util\BinarySerialization\Vector3Data.cs" />
      <Compile Include="Assets\Scripts\Damages\DamageableObjectPart.cs" />
      <Compile Include="Assets\Scripts\Weapons\Classes\BulletParameters.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\CoverManager.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\AiState.cs" />
      <Compile Include="Assets\Scripts\Debug\StringBasedColor.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\Configs\HelpStateConfig.cs" />
      <Compile Include="Assets\Scripts\Weapons\Classes\TriggerParameters.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\Groups\GroupRoles\Configs\MedicRoleConfig.cs" />
      <Compile Include="Assets\Scripts\Util\Vector3Util.cs" />
      <Compile Include="Assets\Scripts\Character\CameraZoom.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\Groups\GroupRoles\Configs\CommonRoleConfig.cs" />
      <Compile Include="Assets\Scripts\Character\WeaponController.cs" />
+     <Compile Include="Assets\Scripts\AI\Classes\States\IdleState.cs" />
      <Compile Include="Assets\Scripts\Weapons\Classes\MuzzleParameters.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\Classes\CoverBaker.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\Debug\NavMeshLinesVisualizer.cs" />
      <Compile Include="Assets\Scripts\Preferences\Settings.cs" />
-     <Compile Include="Assets\Scripts\AI\AiManager.cs" />
-     <Compile Include="Assets\Scripts\AI\Enums\AiGroupRole.cs" />
-     <Compile Include="Assets\Scripts\AI\Scriptables\AiBotConfig.cs" />
-     <Compile Include="Assets\Scripts\AI\Enums\AiBotType.cs" />
-     <Compile Include="Assets\Scripts\AI\Classes\AiState.cs" />
-     <Compile Include="Assets\Scripts\AI\Classes\AiGroup.cs" />
-     <Compile Include="Assets\Scripts\AI\Classes\AiBot.cs" />
-     <Compile Include="Assets\Scripts\AI\Enums\AiBotState.cs" />
+     <Compile Include="Assets\Scripts\AI\AiBot.cs" />
      <None Include="Assets\Shaders\PostProcessing\ArtifactImageEffect.shader" />
      <None Include="Assets\Scripts\Level\readme.txt" />
      <None Include="Assets\Shaders\Surface Diffuse.shader" />
@@ -734,8 +761,6 @@
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Users/maksi/Desktop/Projects/Unity/project-SkullCrusher/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
  </Reference>
-  </ItemGroup>
-  <ItemGroup>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

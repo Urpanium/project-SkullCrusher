@@ -55,6 +55,32 @@ namespace Level.Covers
             UpdateCenters();
         }
 
+        public Vector3 GetNearestCoverPosition(Vector3 position, Vector3 playerDirection, float angleThreshold)
+        {
+            int clusterId = GetNearestCluster(position);
+            List<Cover> cluster = efficientCoverList[clusterId];
+
+            int bestCoverId = 0;
+            float bestDistance = float.MaxValue;
+            for (int i = 0; i < cluster.Count; i++)
+            {
+                Cover cover = cluster[i];
+                float angle = Vector3.Angle(cover.direction, playerDirection);
+                if (angle <= angleThreshold)
+                {
+                    Vector3 delta = position - cover.position;
+                    float distance = delta.sqrMagnitude;
+                    if (distance < bestDistance)
+                    {
+                        bestDistance = distance;
+                        bestCoverId = i;
+                    }
+                }
+            }
+
+            return cluster[bestCoverId].position;
+        }
+        
         public int GetNearestCluster(Vector3 position)
         {
             int minDistanceIndex = 0;
@@ -63,7 +89,8 @@ namespace Level.Covers
             for (int i = 0; i < centers.Count; i++)
             {
                 Vector3 center = centers[i];
-                float distance = Vector3.Distance(position, center);
+                Vector3 delta = position - center;
+                float distance = delta.sqrMagnitude;
                 if (distance < minDistance)
                 {
                     minDistanceIndex = i;

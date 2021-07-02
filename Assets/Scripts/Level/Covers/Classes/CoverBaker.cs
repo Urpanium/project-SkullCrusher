@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Level.Covers.Classes;
 using Level.Covers.Classes.Util;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Level.Covers
+namespace Level.Covers.Classes
 {
     [Serializable]
     public class CoverBaker
@@ -17,17 +16,16 @@ namespace Level.Covers
         private readonly float characterRadius;
 
         private readonly float linePointsEpsilon;
-        /*private readonly float lineMergeEpsilon;*/
 
 
         public CoverBaker(LayerMask shootableMask, float characterStandHeight, float characterCrouchHeight,
-            float characterRadius, float linePointsEpsilon = 0.01f, float lineMergeEpsilon = 0.01f)
+            float characterRadius, float linePointsEpsilon = 0.01f)
         {
             this.shootableMask = shootableMask;
             this.characterStandHeight = characterStandHeight;
             this.characterCrouchHeight = characterCrouchHeight;
             this.characterRadius = characterRadius;
-            this.linePointsEpsilon = linePointsEpsilon;
+            this.linePointsEpsilon = linePointsEpsilon; 
         }
 
         public List<Cover> BakeCovers()
