@@ -7,13 +7,11 @@ namespace AI.Classes.States
     {
         private AttackStateConfig stateConfig;
 
-        private ChaseStateConfig chaseStateConfig;
 
         public AttackState(AiStateConfig config, AiBot bot, Transform player) : base(config, bot, player)
         {
             name = AttackState;
             stateConfig = (AttackStateConfig) config;
-            chaseStateConfig = bot.config.chaseStateConfig;
         }
 
         public override void Update()
@@ -29,24 +27,25 @@ namespace AI.Classes.States
                 }
             }
 
-            if (distance > bot.controller.visionDistance * stateConfig.playerFollowVisionDistancePart)
+            if (distance > bot.config.visionDistance * stateConfig.playerFollowVisionDistancePart)
             {
                 bot.controller.GoTo(Vector3.Lerp(bot.transform.position, player.position,
                     stateConfig.playerFollowVisionDistancePart));
             }
-
+            bot.TrackPlayer();
+            bot.controller.LookAt(playerPosition);
             bot.Fire();
         }
 
         public override string TransitionCheck()
         {
             float playerVisibility = bot.controller.GetPlayerVisibility();
-            if (playerVisibility > chaseStateConfig.contactLosePlayerVisibility)
+            if (playerVisibility > stateConfig.contactLosePlayerVisibility)
             {
                 return ChaseState;
             }
 
-            if (bot.IsNeedToReload())
+            if (bot.IsNeedToStartSeekingCover())
             {
                 return TakeCoverState;
             }
@@ -60,7 +59,7 @@ namespace AI.Classes.States
         private bool TryGetRetreatPoint(out Vector3 point)
         {
             const int retreatSearchSamples = 10;
-            float botHeight = bot.controller.characterHeight;
+            float botHeight = bot.config.characterHeight;
             Vector3 position = bot.transform.position;
             Vector3 playerDelta = position - player.position;
             playerDelta.y = 0;
@@ -73,8 +72,8 @@ namespace AI.Classes.States
             Ray ray1 = new Ray(position + Vector3.up * (botHeight * 0.5f), playerDelta);
             Ray ray2 = new Ray(position - Vector3.up * (botHeight * 0.499f), playerDelta);
 
-            if (!Physics.Raycast(ray1, retreatAtDistance, bot.controller.visibleObjectsMask)
-                || !Physics.Raycast(ray2, retreatAtDistance, bot.controller.visibleObjectsMask))
+            if (!Physics.Raycast(ray1, retreatAtDistance, bot.config.visibleObjectsMask)
+                || !Physics.Raycast(ray2, retreatAtDistance, bot.config.visibleObjectsMask))
             {
                 point = position + playerDelta.normalized * retreatAtDistance;
                 return true;
@@ -90,8 +89,8 @@ namespace AI.Classes.States
                 Vector3 direction = playerDelta * y + playerDeltaRight * x;
                 ray1 = new Ray(position + Vector3.up * (botHeight * 0.5f), direction);
                 ray2 = new Ray(position - Vector3.up * (botHeight * 0.499f), direction);
-                if (!Physics.Raycast(ray1, retreatAtDistance, bot.controller.visibleObjectsMask)
-                    || !Physics.Raycast(ray2, retreatAtDistance, bot.controller.visibleObjectsMask))
+                if (!Physics.Raycast(ray1, retreatAtDistance, bot.config.visibleObjectsMask)
+                    || !Physics.Raycast(ray2, retreatAtDistance, bot.config.visibleObjectsMask))
                 {
                     point = position + direction * retreatAtDistance;
                     return true;

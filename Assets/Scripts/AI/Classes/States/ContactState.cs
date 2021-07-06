@@ -1,6 +1,4 @@
-﻿using AI.Classes.Groups.GroupRoles;
-using AI.Classes.States.Configs;
-using AI.Enums;
+﻿using AI.Classes.States.Configs;
 using UnityEngine;
 
 namespace AI.Classes.States
@@ -40,6 +38,13 @@ namespace AI.Classes.States
                 */
                 return AttackState;
             }
+
+            if (playerVisibility < stateConfig.contactLosePlayerVisibility)
+            {
+                contactTime = 0.0f;
+                return IdleState;
+            }
+            
             return KeepCurrentState;
         }
     }

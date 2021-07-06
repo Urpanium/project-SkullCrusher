@@ -2,6 +2,7 @@
 using AI.Classes.States;
 using AI.Enums;
 using AI.Scriptables;
+using Character;
 using Damages;
 using Preferences;
 using UnityEngine;
@@ -24,10 +25,12 @@ namespace AI
         private AiState state;
         
         private Transform playerTransform;
+        private Controller playerController;
         private DamageableObject damageableObject;
         private Weapon equippedWeapon;
 
         private Vector3 lastPlayerPosition;
+        private Vector3 lastPlayerVelocity;
         
         private void Awake()
         {
@@ -40,6 +43,8 @@ namespace AI
 
             aiManager = globalController.GetComponent<AiManager>();
             controller = GetComponent<AiController>();
+            
+            playerController = playerTransform.GetComponent<Controller>();
             if (initialWeapon)
                 EquipWeapon(initialWeapon);
             /*
@@ -63,6 +68,11 @@ namespace AI
             // TODO: implement EquipWeapon()
         }
         
+        /*
+         * =================================================
+         * ================ SHIT FOR STATES ================
+         * =================================================
+         */
         public void Fire()
         {
             // TODO: implement Fire()
@@ -75,7 +85,12 @@ namespace AI
 
         public bool IsInGroup()
         {
-            return groupRole == AiBotGroupRole.Single;
+            return groupRole != AiBotGroupRole.Single;
+        }
+
+        public bool IsNeedToStartSeekingCover()
+        {
+            return (float)equippedWeapon.currentClipAmmoAmount / equippedWeapon.weaponParameters.clipAmmoAmount <= config.predictTakingCoverClipAmmoMultiplier;
         }
 
         public bool IsNeedToReload()
@@ -86,11 +101,17 @@ namespace AI
         public void TrackPlayer()
         {
             lastPlayerPosition = playerTransform.position;
+            lastPlayerVelocity = playerController.GetVelocity();
         }
 
         public Vector3 GetPlayerLastPosition()
         {
             return lastPlayerPosition;
+        }
+
+        public Vector3 GetPlayerLastVelocity()
+        {
+            return lastPlayerVelocity;
         }
         
     }

@@ -8,7 +8,7 @@ namespace AI
     [RequireComponent(typeof(NavMeshAgent))]
     public class AiController : MonoBehaviour
     {
-        [Header("Character")] public float characterSpeed = 1.0f;
+        /*[Header("Character")] public float characterSpeed = 1.0f;
 
         public Transform headTransform;
         public float headRotationSpeed = 1.0f;
@@ -16,13 +16,12 @@ namespace AI
         public Transform bodyTransform;
         public float bodyRotationSpeed = 2.0f;
 
-        public float characterHeight = 2.0f;
+        public float characterHeight = 2.0f;*/
         
-        [Header("Vision")] public float visionAngle = 60.0f;
-        public float visionDistance = 50.0f;
-        public LayerMask visibleObjectsMask;
-
-
+        [Header("Character")]
+        public Transform headTransform;
+        public Transform bodyTransform;
+        
         [Header("Misc")] public float
             maxNeckAngleDelta =
                 72.0f; // google didn't help, there is no information about human's max neck rotation angle 
@@ -38,11 +37,31 @@ namespace AI
         private List<MeshRenderer> playerParts;
         private float perPartPointMultiplier;
 
+        private float bodyRotationSpeed;
+        private float headRotationSpeed;
+        private float characterHeight;
+        
+        private float visionDistance;
+        private float visionAngle;
+
+        private LayerMask visibleObjectsMask;
+
 
         private void Start()
         {
+            AiBot aiBot = GetComponent<AiBot>();
             navMeshAgent = GetComponent<NavMeshAgent>();
-            navMeshAgent.speed = characterSpeed;
+            navMeshAgent.speed = aiBot.config.characterSpeed;
+
+            bodyRotationSpeed = aiBot.config.bodyRotationSpeed;
+            headRotationSpeed = aiBot.config.headRotationSpeed;
+            characterHeight = aiBot.config.characterHeight;
+
+            visionDistance = aiBot.config.visionDistance;
+            visionAngle = aiBot.config.visionAngle;
+
+            visibleObjectsMask = aiBot.config.visibleObjectsMask;
+            
 
             playerTransform = GameObject.FindGameObjectWithTag(Settings.Tags.Player).transform;
 
@@ -110,7 +129,7 @@ namespace AI
 
         public bool IsLookingAtTarget()
         {
-            return (transform.forward - (targetLookPosition - transform.position)).magnitude < 0.01f;
+            return (transform.forward - (targetLookPosition - transform.position)).sqrMagnitude < 0.01f;
         }
 
         public void StopMoving()

@@ -7,6 +7,26 @@ namespace AI.Scriptables
     [CreateAssetMenu(fileName = "AiConfig", menuName = "Skull Crusher/Ai Bot Config")]
     public class AiBotConfig : ScriptableObject
     {
+        [Header("Character")] public float characterSpeed = 1.0f;
+        public float headRotationSpeed = 1.0f;
+        public float bodyRotationSpeed = 2.0f;
+        public float characterHeight = 2.0f;
+        
+        [Header("Weapon")]
+        [Range(0, 1)] public float aimingAccuracy = 0.7f;
+        [Range(0, 1)] public float recoilNeutralization = 0.5f;
+        [Range(0, 1)] public float predictTakingCoverClipAmmoMultiplier = 0.10f;
+        public float reloadTimeMultiplier = 1.75f;
+        
+        [Header("Behaviour")]
+        [Range(0, 1)] public float coverPreference = 0.95f;
+        [Range(0, 1)] public float grenadePreference = 0.25f;
+        [Range(0, 1)] public float weaponChangePreference = 0.25f;
+
+        [Header("Vision")] public float visionAngle = 60.0f;
+        public float visionDistance = 50.0f;
+        public LayerMask visibleObjectsMask;
+        
         [Header("State Settings")] public bool allowIdleState = true;
         public bool allowContactState = true;
         public bool allowAttackState = true;
@@ -25,10 +45,8 @@ namespace AI.Scriptables
         public bool canBeMedic = true;
 
         /*[Header("Behaviours Settings")]
-        [Range(0, 1)] public float coverPreference = 0.95f;
-        [Range(0, 1)] public float grenadePreference = 0.25f;
-        [Range(0, 1)] public float weaponChangePreference = 0.25f;*/
-        [Header("State Settings")] public IdleStateConfig idleStateConfig;
+        */
+        [Header("States Configs")] public IdleStateConfig idleStateConfig;
         public ContactStateConfig contactStateConfig;
         public AttackStateConfig attackStateConfig;
         public TakeCoverStateConfig takeCoverStateConfig;

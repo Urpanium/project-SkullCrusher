@@ -79,11 +79,14 @@
      <Compile Include="Assets\Scripts\AI\Classes\States\AttackState.cs" />
      <Compile Include="Assets\Scripts\AI\Classes\Groups\GroupRoles\Configs\RearAttackerRoleConfig.cs" />
      <Compile Include="Assets\Scripts\Util\ColorUtil.cs" />
+     <Compile Include="Assets\Scripts\Debug\RandomizedDirection.cs" />
      <Compile Include="Assets\Scripts\Damages\DamagableObject.cs" />
      <Compile Include="Assets\Scripts\UI\ClipAmmoText.cs" />
      <Compile Include="Assets\Scripts\AI\Classes\Groups\AiGroup.cs" />
+     <Compile Include="Assets\Scripts\Util\WeightedRandom.cs" />
      <Compile Include="Assets\Scripts\Weapons\Bullet.cs" />
      <Compile Include="Assets\Scripts\AI\Classes\States\Configs\RearAttackStateConfig.cs" />
+     <Compile Include="Assets\Scripts\Debug\CoverDirection.cs" />
      <Compile Include="Assets\Scripts\Damages\DamageableGroup.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\Classes\Util\Line.cs" />
      <Compile Include="Assets\Scripts\Level\Covers\Classes\Util\BinarySerialization\CoverData.cs" />
@@ -761,6 +764,8 @@
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Users/maksi/Desktop/Projects/Unity/project-SkullCrusher/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
  </Reference>
+  </ItemGroup>
+  <ItemGroup>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

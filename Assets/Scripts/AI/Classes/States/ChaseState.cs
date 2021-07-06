@@ -16,12 +16,23 @@ namespace AI.Classes.States
         
         public override void Update()
         {
-            throw new System.NotImplementedException();
+            bot.controller.GoTo(bot.GetPlayerLastPosition() + bot.GetPlayerLastVelocity());
         }
 
         public override string TransitionCheck()
         {
-            throw new System.NotImplementedException();
+            float playerVisibility = bot.controller.GetPlayerVisibility();
+            if (playerVisibility > stateConfig.detectionPlayerVisibility)
+            {
+                return AttackState;
+            }
+            
+            if (bot.controller.IsArrivedAtTargetPosition())
+            {
+                return SearchState;
+            }
+
+            return KeepCurrentState;
         }
     }
 }

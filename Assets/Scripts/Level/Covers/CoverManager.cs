@@ -80,7 +80,7 @@ namespace Level.Covers
 
             return cluster[bestCoverId].position;
         }
-        
+
         public int GetNearestCluster(Vector3 position)
         {
             int minDistanceIndex = 0;
@@ -101,6 +101,11 @@ namespace Level.Covers
             return minDistanceIndex;
         }
 
+        public List<Cover> GetNearestClusterList(Vector3 position)
+        {
+            return efficientCoverList[GetNearestCluster(position)];
+        }
+
         public Vector3 GetCenter(int index)
         {
             return centers[index];
@@ -118,15 +123,39 @@ namespace Level.Covers
             clusterMaker = new CoverClusterMaker(clustersCount, bakedCovers);
             List<int> bakedClusterIds = clusterMaker.Clusterize(out centers);
 
+
             SerializableCoverList serializableCoverList = new SerializableCoverList(bakedCovers, bakedClusterIds);
 
             SaveCoversAsBinary(serializableCoverList);
             ApplySerializableCoverList(serializableCoverList);
+            PrintClustersInfo();
             /*if (covers.Count > 1000)
                 drawCovers = false;
             efficientCoverList = MakeEfficientCoversList(bakedCovers, bakedClusterIds);
             UpdateBounds();*/
         }
+
+        private void PrintClustersInfo()
+        {
+            int maxClusterSize = 0;
+            int maxClusterSizeIndex = 0;
+            float averageClusterSize = 0;
+
+            for (int i = 0; i < efficientCoverList.Count; i++)
+            {
+                int count = efficientCoverList[i].Count;
+                averageClusterSize += count;
+                if (count > maxClusterSize)
+                {
+                    maxClusterSize = count;
+                    maxClusterSizeIndex = i;
+                }
+            }
+
+            averageClusterSize /= efficientCoverList.Count;
+            print($"Baked covers. Max cluster size: {maxClusterSize} at {GetCenter(maxClusterSizeIndex)}, average size: {averageClusterSize}");
+        }
+
 
         private void ApplySerializableCoverList(SerializableCoverList serializableCoverList)
         {

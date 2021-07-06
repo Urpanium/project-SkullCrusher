@@ -1,4 +1,5 @@
-﻿using AI.Classes.States.Configs;
+﻿using System;
+using AI.Classes.States.Configs;
 using Level.Covers;
 using Preferences;
 using UnityEngine;
@@ -9,9 +10,12 @@ namespace AI.Classes.States
     {
         private TakeCoverStateConfig stateConfig;
 
+        private ContactStateConfig contactStateConfig;
+
         private CoverManager coverManager;
         private bool takingCoverForReloading;
         private bool pickedCover;
+        private bool startedReload;
 
         public TakeCoverState(AiStateConfig config, AiBot bot, Transform player): base(config, bot, player)
         {
@@ -19,7 +23,7 @@ namespace AI.Classes.States
             stateConfig = (TakeCoverStateConfig) config;
             GameObject globalController = GameObject.Find(Settings.GameObjects.GlobalController);
             coverManager = globalController.GetComponent<CoverManager>();
-            takingCoverForReloading = bot.IsNeedToReload();
+            takingCoverForReloading = bot.IsNeedToStartSeekingCover();
             
         }
 
@@ -36,17 +40,29 @@ namespace AI.Classes.States
             
             if (pickedCover && bot.controller.IsArrivedAtTargetPosition())
             {
-                // TODO: predict reloading to start searching for cover earlier
                 if (takingCoverForReloading)
                 {
-                    bot.ReloadWeapon();
+                    if (bot.IsNeedToReload())
+                    {
+                        bot.ReloadWeapon();
+                        startedReload = true;
+                    }
+                    else
+                    {
+                        bot.Fire();
+                    }
                 }
             }
         }
 
         public override string TransitionCheck()
         {
-            
+            if (pickedCover && bot.controller.IsArrivedAtTargetPosition() && startedReload && !bot.IsNeedToReload())
+            {
+                return AttackState;
+            }
+
+            return KeepCurrentState;
         }
     }
 }

@@ -52,7 +52,7 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\Level\Covers\Editor\CoverManagerInspector.cs" />
+     <Compile Include="Assets\Scripts\Level\Covers\Editor\CoverManagerEditor.cs" />
  <Reference Include="UnityEngine">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2020.2.0f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
  </Reference>
